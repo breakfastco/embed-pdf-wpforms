@@ -14,7 +14,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-if ( ! defined( 'MBED_PDF_WPFORMS_PATH' ) ) {
+if ( ! defined( 'EMBED_PDF_WPFORMS_PATH' ) ) {
 	define( 'EMBED_PDF_WPFORMS_PATH', __FILE__ );
 }
 if ( ! defined( 'EMBED_PDF_WPFORMS_VERSION' ) ) {

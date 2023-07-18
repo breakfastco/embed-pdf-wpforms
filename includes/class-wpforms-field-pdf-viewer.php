@@ -34,6 +34,8 @@ if ( class_exists( 'WPForms_Field' ) ) {
 		 */
 		const STYLE_MODERN = 'modern';
 
+		const DEFAULT_SCALE_VALUE = '1';
+
 		/**
 		 * Primary class constructor.
 		 *
@@ -46,23 +48,23 @@ if ( class_exists( 'WPForms_Field' ) ) {
 			$this->type     = 'pdf_viewer';
 			$this->icon     = 'fa-caret-square-o-down';
 			$this->order    = 200;
-			$this->defaults = array(
-				1 => array(
-					'label'   => esc_html__( 'First Choice', 'embed-pdf-wpforms' ),
-					'value'   => '',
-					'default' => '',
-				),
-				2 => array(
-					'label'   => esc_html__( 'Second Choice', 'embed-pdf-wpforms' ),
-					'value'   => '',
-					'default' => '',
-				),
-				3 => array(
-					'label'   => esc_html__( 'Third Choice', 'embed-pdf-wpforms' ),
-					'value'   => '',
-					'default' => '',
-				),
-			);
+			// $this->defaults = array(
+			// 	1 => array(
+			// 		'label'   => esc_html__( 'First Choice', 'embed-pdf-wpforms' ),
+			// 		'value'   => '',
+			// 		'default' => '',
+			// 	),
+			// 	2 => array(
+			// 		'label'   => esc_html__( 'Second Choice', 'embed-pdf-wpforms' ),
+			// 		'value'   => '',
+			// 		'default' => '',
+			// 	),
+			// 	3 => array(
+			// 		'label'   => esc_html__( 'Third Choice', 'embed-pdf-wpforms' ),
+			// 		'value'   => '',
+			// 		'default' => '',
+			// 	),
+			// );
 
 			// Define additional field properties.
 			add_filter( 'wpforms_field_properties_' . $this->type, array( $this, 'field_properties' ), 5, 3 );
@@ -71,7 +73,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 			add_action( 'wpforms_frontend_css', array( $this, 'enqueue_frontend_css' ) );
 
 			// Form frontend JS enqueues.
-			add_action( 'wpforms_frontend_js', array( $this, 'enqueue_frontend_js' ) );
+			add_action( 'wpforms_frontend_js', array( $this, 'load_js' ) );
 
 			add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_block_editor_assets' ) );
 		}
@@ -89,20 +91,8 @@ if ( class_exists( 'WPForms_Field' ) ) {
 		 */
 		public function field_properties( $properties, $field, $form_data ) {
 
-			// Remove primary input.
-			unset( $properties['inputs']['primary'] );
-
 			$form_id  = absint( $form_data['id'] );
 			$field_id = absint( $field['id'] );
-
-			// Use the selected choice value as the submitted value, not the labels.
-			$field['show_values'] = true;
-			$choices              = array(
-				array(
-					'label' => __( 'Please choose a vehicle...', 'embed-pdf-wpforms' ),
-					'value' => '',
-				),
-			);
 
 			// Set options container (<select>) properties.
 			$properties['input_container'] = array(
@@ -115,38 +105,38 @@ if ( class_exists( 'WPForms_Field' ) ) {
 			);
 
 			// Set properties.
-			foreach ( $choices as $key => $choice ) {
+			// foreach ( $choices as $key => $choice ) {
 
-				// Used for dynamic choices.
-				$depth = 1;
+			// 	// Used for dynamic choices.
+			// 	$depth = 1;
 
-				$properties['inputs'][ $key ] = array(
-					'container' => array(
-						'attr'  => array(),
-						'class' => array( "choice-{$key}", "depth-{$depth}" ),
-						'data'  => array(),
-						'id'    => '',
-					),
-					'label'     => array(
-						'attr'  => array(
-							'for' => "wpforms-{$form_id}-field_{$field_id}_{$key}",
-						),
-						'class' => array( 'wpforms-field-label-inline' ),
-						'data'  => array(),
-						'id'    => '',
-						'text'  => $choice['label'],
-					),
-					'attr'      => array(
-						'name'  => "wpforms[fields][{$field_id}]",
-						'value' => isset( $field['show_values'] ) ? $choice['value'] : $choice['label'],
-					),
-					'class'     => array(),
-					'data'      => array(),
-					'id'        => "wpforms-{$form_id}-field_{$field_id}_{$key}",
-					'required'  => ! empty( $field['required'] ) ? 'required' : '',
-					'default'   => isset( $choice['default'] ),
-				);
-			}
+			// 	$properties['inputs'][ $key ] = array(
+			// 		'container' => array(
+			// 			'attr'  => array(),
+			// 			'class' => array( "choice-{$key}", "depth-{$depth}" ),
+			// 			'data'  => array(),
+			// 			'id'    => '',
+			// 		),
+			// 		'label'     => array(
+			// 			'attr'  => array(
+			// 				'for' => "wpforms-{$form_id}-field_{$field_id}_{$key}",
+			// 			),
+			// 			'class' => array( 'wpforms-field-label-inline' ),
+			// 			'data'  => array(),
+			// 			'id'    => '',
+			// 			'text'  => $choice['label'],
+			// 		),
+			// 		'attr'      => array(
+			// 			'name'  => "wpforms[fields][{$field_id}]",
+			// 			'value' => isset( $field['show_values'] ) ? $choice['value'] : $choice['label'],
+			// 		),
+			// 		'class'     => array(),
+			// 		'data'      => array(),
+			// 		'id'        => "wpforms-{$form_id}-field_{$field_id}_{$key}",
+			// 		'required'  => ! empty( $field['required'] ) ? 'required' : '',
+			// 		'default'   => isset( $choice['default'] ),
+			// 	);
+			// }
 
 			// Add class that changes the field size.
 			if ( ! empty( $field['size'] ) ) {
@@ -270,7 +260,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 			);
 
 			$fld = $this->field_element(
-				'select',
+				'text', //'select',
 				$field,
 				array(
 					'slug'    => 'style',
@@ -380,80 +370,161 @@ if ( class_exists( 'WPForms_Field' ) ) {
 		 * @param array $form_data  Form data and settings.
 		 */
 		public function field_display( $field, $deprecated, $form_data ) {
-			$container         = $field['properties']['input_container'];
-			$field_placeholder = ! empty( $field['placeholder'] ) ? $field['placeholder'] : '';
-			$is_multiple       = ! empty( $field['multiple'] );
-			$is_modern         = ! empty( $field['style'] ) && self::STYLE_MODERN === $field['style'];
-			$choices           = $field['properties']['inputs'];
 
-			if ( ! empty( $field['required'] ) ) {
-				$container['attr']['required'] = 'required';
+			// What is the PDF URL?
+			// The user might have chosen a PDF and saved it with the form.
+			//$url = $this->pdfUrl;
+			//TODO: stop hard-coding the PDF URL
+			$url = 'https://breakfastco.test/wp-content/uploads/vscode-keyboard-shortcuts-macos.pdf';
+			if ( ! filter_var( $url, FILTER_VALIDATE_URL ) ) {
+				$url = '';
 			}
+			//TODO allow dynamic population
+			// // Do we have a PDF URL via Dynamic Population?
+			// if ( ! empty( $value ) ) {
+			// 	// Is the populated value a URL?
+			// 	if ( filter_var( $value, FILTER_VALIDATE_URL ) ) {
+			// 		// Yes.
+			// 		$url = esc_url( $value );
+			// 	}
+			// }
 
-			// If it's a multiple select.
-			if ( $is_multiple ) {
-				$container['attr']['multiple'] = 'multiple';
+			// // Do we even have a PDF?
+			// if ( empty( $url ) ) {
+			// 	// No.
+			// 	// Are we on a feed settings page? This isn't a problem when configuring feeds in the pro version.
+			// 	if ( 'form_settings_embedpdfviewerpro' !== GFForms::get_page() ) {
+			// 		$this->log_error( sprintf( __( 'No PDF to load into field %1$s on form %2$s', 'embed-pdf-gravityforms' ), $this->id, $form['id'] ) );
+			// 		return;
+			// 	}
+			// }
 
-				// Change a name attribute.
-				if ( ! empty( $container['attr']['name'] ) ) {
-					$container['attr']['name'] .= '[]';
-				}
-			}
+			// Define data.
+			$primary       = $field['properties']['inputs']['primary'];
+			$field_id      = $field['id'];
+			$form_id       = $form_data['id'];
+			$canvas_id     = $field_id . '_embed_pdf_wpforms';
+			$initial_scale = '1';
 
-			// Add a class for Choices.js initialization.
-			if ( $is_modern ) {
-				$container['class'][] = 'choicesjs-select';
+			$canvas_controls = sprintf(
+				'<div class="epgf-controls-container">'
+					// Paging controls.
+					. '<button class="button" onclick="return false" id="%1$s_prev" data-viewer-id="%7$s" title="%2$s">%2$s</button> <button class="button" onclick="return false" id="%1$s_next" data-viewer-id="%7$s" title="%3$s">%3$s</button> '
+					. '<span class="paging">%4$s <span id="%1$s_page_num"></span> / <span id="%1$s_page_count"></span></span> '
+					// Zoom controls.
+					. '<span class="zoom"><button class="button" onclick="return false" id="%1$s_zoom_out" data-viewer-id="%7$s" title="%5$s">%5$s</button> <button class="button" onclick="return false" id="%1$s_zoom_in" data-viewer-id="%7$s" title="%6$s">%6$s</button></span>'
+					. '</div>'
+					. '<div class="epgf-container"><canvas id="%1$s" class="epgf"></canvas></div>',
+				esc_attr( $canvas_id ),
+				esc_html__( 'Previous', 'embed-pdf-gravityforms' ),
+				esc_html__( 'Next', 'embed-pdf-gravityforms' ),
+				esc_html__( 'Page:', 'embed-pdf-gravityforms' ),
+				esc_html__( 'Zoom Out', 'embed-pdf-gravityforms' ),
+				esc_html__( 'Zoom In', 'embed-pdf-gravityforms' ),
+				esc_attr( $field_id )
+			)
+				. "<script type=\"text/javascript\">
+			var epgf_{$field_id} = {
+					canvas: document.getElementById('{$canvas_id}'),
+					canvasId: '{$canvas_id}',
+					initialScale: {$initial_scale} ?? epgf_pdfjs_strings.initialScale,
+					pageNum: 1,
+					pageNumPending: null,
+					pageRendering: false,
+					pdfDoc: null,
+					urlPdf: '{$url}',
+				};
+				window.addEventListener( 'load', function () {
+					document.getElementById('{$canvas_id}_prev').addEventListener('click', onPrevPage);
+					document.getElementById('{$canvas_id}_next').addEventListener('click', onNextPage);
+					document.getElementById('{$canvas_id}_zoom_in').addEventListener('click', onZoomIn);
+					document.getElementById('{$canvas_id}_zoom_out').addEventListener('click', onZoomOut);
+					loadPreview( {$field_id}, {$form_id} );
+				});
+			</script>";
 
-				// Add a size-class to data attribute - it is used when Choices.js is initialized.
-				if ( ! empty( $field['size'] ) ) {
-					$container['data']['size-class'] = 'wpforms-field-row wpforms-field-' . sanitize_html_class( $field['size'] );
-				}
-
-				$container['data']['search-enabled'] = $this->is_choicesjs_search_enabled( count( $choices ) );
-			}
-
-			$has_default = false;
-
-			// Check to see if any of the options were selected by default.
-			foreach ( $choices as $choice ) {
-				if ( ! empty( $choice['default'] ) ) {
-					$has_default = true;
-					break;
-				}
-			}
-
-			// Fake placeholder for Modern style.
-			if ( $is_modern && empty( $field_placeholder ) ) {
-				$first_choices     = reset( $choices );
-				$field_placeholder = $first_choices['label']['text'];
-			}
-
-			// Preselect default if no other choices were marked as default.
+			// Primary field.
 			printf(
-				'<select %s>',
-				wpforms_html_attributes( $container['id'], $container['class'], $container['data'], $container['attr'] )
+				'<div %s>%s</div>',
+				wpforms_html_attributes( $primary['id'], $primary['class'], $primary['data'], $primary['attr'] ),
+				$canvas_controls
 			);
 
-			// Optional placeholder.
-			if ( ! empty( $field_placeholder ) ) {
-				printf(
-					'<option value="" class="placeholder" disabled %s>%s</option>',
-					selected( false, $has_default || $is_multiple, false ),
-					esc_html( $field_placeholder )
-				);
-			}
+			// Select field code.
+			// $container         = $field['properties']['input_container'];
+			// $field_placeholder = ! empty( $field['placeholder'] ) ? $field['placeholder'] : '';
+			// $is_multiple       = ! empty( $field['multiple'] );
+			// $is_modern         = ! empty( $field['style'] ) && self::STYLE_MODERN === $field['style'];
+			// $choices           = $field['properties']['inputs'];
 
-			// Build the select options.
-			foreach ( $choices as $key => $choice ) {
-				printf(
-					'<option value="%s" %s>%s</option>',
-					esc_attr( $choice['attr']['value'] ),
-					selected( true, ! empty( $choice['default'] ), false ),
-					esc_html( $choice['label']['text'] )
-				);
-			}
+			// if ( ! empty( $field['required'] ) ) {
+			// 	$container['attr']['required'] = 'required';
+			// }
 
-			echo '</select>';
+			// // If it's a multiple select.
+			// if ( $is_multiple ) {
+			// 	$container['attr']['multiple'] = 'multiple';
+
+			// 	// Change a name attribute.
+			// 	if ( ! empty( $container['attr']['name'] ) ) {
+			// 		$container['attr']['name'] .= '[]';
+			// 	}
+			// }
+
+			// // Add a class for Choices.js initialization.
+			// if ( $is_modern ) {
+			// 	$container['class'][] = 'choicesjs-select';
+
+			// 	// Add a size-class to data attribute - it is used when Choices.js is initialized.
+			// 	if ( ! empty( $field['size'] ) ) {
+			// 		$container['data']['size-class'] = 'wpforms-field-row wpforms-field-' . sanitize_html_class( $field['size'] );
+			// 	}
+
+			// 	$container['data']['search-enabled'] = $this->is_choicesjs_search_enabled( count( $choices ) );
+			// }
+
+			// $has_default = false;
+
+			// // Check to see if any of the options were selected by default.
+			// foreach ( $choices as $choice ) {
+			// 	if ( ! empty( $choice['default'] ) ) {
+			// 		$has_default = true;
+			// 		break;
+			// 	}
+			// }
+
+			// // Fake placeholder for Modern style.
+			// if ( $is_modern && empty( $field_placeholder ) ) {
+			// 	$first_choices     = reset( $choices );
+			// 	$field_placeholder = $first_choices['label']['text'];
+			// }
+
+			// // Preselect default if no other choices were marked as default.
+			// printf(
+			// 	'<select %s>',
+			// 	wpforms_html_attributes( $container['id'], $container['class'], $container['data'], $container['attr'] )
+			// );
+
+			// // Optional placeholder.
+			// if ( ! empty( $field_placeholder ) ) {
+			// 	printf(
+			// 		'<option value="" class="placeholder" disabled %s>%s</option>',
+			// 		selected( false, $has_default || $is_multiple, false ),
+			// 		esc_html( $field_placeholder )
+			// 	);
+			// }
+
+			// // Build the select options.
+			// foreach ( $choices as $key => $choice ) {
+			// 	printf(
+			// 		'<option value="%s" %s>%s</option>',
+			// 		esc_attr( $choice['attr']['value'] ),
+			// 		selected( true, ! empty( $choice['default'] ), false ),
+			// 		esc_html( $choice['label']['text'] )
+			// 	);
+			// }
+
+			// echo '</select>';
 		}
 
 		/**
@@ -558,20 +629,50 @@ if ( class_exists( 'WPForms_Field' ) ) {
 		 *
 		 * @param array $forms Forms on the current page.
 		 */
-		public function enqueue_frontend_js( $forms ) {
+		public function load_js( $forms ) {
 
-			$has_modern_select = false;
+			if (
+				wpforms_has_field_type( 'pdf_viewer', $forms, true ) ||
+				wpforms()->get( 'frontend' )->assets_global()
+			) {
+				$handle = 'epgf_pdfjs';
+				wp_enqueue_script(
+					$handle,
+					plugins_url( 'js/pdfjs/pdf.min.js', EMBED_PDF_WPFORMS_PATH ), // No un-minimized version of this script included.
+					array(),
+					EMBED_PDF_WPFORMS_VERSION,
+					true
+				);
+				wp_add_inline_script(
+					$handle,
+					'const epgf_pdfjs_strings = ' . json_encode(
+						array(
+							'url_worker'        => plugins_url( 'js/pdfjs/pdf.worker.min.js', EMBED_PDF_WPFORMS_PATH ), // No unminimized version of this script included.
+							'initial_scale'     => self::DEFAULT_SCALE_VALUE,
+							'is_user_logged_in' => is_user_logged_in(),
+						)
+					),
+					'before'
+				);
 
-			foreach ( $forms as $form ) {
-				if ( $this->is_field_style( $form, self::STYLE_MODERN ) ) {
-					$has_modern_select = true;
-
-					break;
-				}
-			}
-
-			if ( $has_modern_select || wpforms()->frontend->assets_global() ) {
-				$this->enqueue_choicesjs_once( $forms );
+				$handle = 'epgf_pdf_viewer';
+				$min    = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+				wp_enqueue_script(
+					$handle,
+					plugins_url( "js/field-pdf-viewer{$min}.js", EMBED_PDF_WPFORMS_PATH ),
+					array( 'wp-i18n', 'epgf_pdfjs', 'jquery' ),
+					EMBED_PDF_WPFORMS_VERSION,
+					true
+				);
+				wp_add_inline_script(
+					$handle,
+					'const epgf_pdf_viewer_strings = ' . json_encode(
+						array(
+							'site_url' => site_url(),
+						)
+					),
+					'before'
+				);
 			}
 		}
 
