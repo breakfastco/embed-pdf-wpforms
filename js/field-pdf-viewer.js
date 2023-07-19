@@ -1,68 +1,8 @@
-// After field settings are loaded in the form editor.
-jQuery( document ).on( 'wpformsReady', ( event ) => {
+// jQuery( document ).on( 'wpformsReady', ( event ) => {
+// 	jQuery('.wpforms-field-pdf_viewer').each( ( field ) => { 
 
-	//TODO: create field array
-	jQuery('.wpforms-field-pdf_viewer').each( ( field ) => { 
-		// Populate and update our text settings for initial scale and PDF URL.
-		var textSettings = {
-			'field_initial_scale': 'initialScale',
-			'field_pdf_url':       'pdfUrl',
-		};
-		Object.keys(textSettings).forEach(key=>{
-			var el = document.getElementById(key);
-			if ( el ) {
-				// Populate the setting value.
-				el.value = field[0][textSettings[key]];
-				// Update the setting when users change the value.
-				[ 'input', 'propertychange' ].forEach(function(e){
-					el.addEventListener(e, function() {
-						SetFieldProperty(textSettings[key], this.value);
-
-						//if this works rewrite
-						if ( 'field_pdf_url' === key ) {
-							if ( '' === this.value ) {
-								resetFieldError( 'pdf_url_setting' );
-								return;
-							}
-
-							// Is it a valid URL?
-							if ( ! isValidHttpUrl( this.value ) ) {
-								const { __ } = wp.i18n;
-								setFieldError(
-									'pdf_url_setting',
-									'below',
-									__( 'Please enter a valid URL.', 'embed-pdf-gravityforms' )
-								);
-							// Is it a local URL?
-							} else if ( epgf_pdf_viewer_strings.site_url !== this.value.substring( 0, epgf_pdf_viewer_strings.site_url.length ) ) {
-								const { __ } = wp.i18n;
-								setFieldError(
-									'pdf_url_setting',
-									'below',
-									__( 'Only PDFs hosted by this website and other websites listing this website in a CORS header ‘Access-Control-Allow-Origin’ can load in the viewer.', 'embed-pdf-gravityforms' )
-										+ '<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">' + __( 'Learn about CORS →', 'embed-pdf-gravityforms' ) + '</a>'
-										//+ '<p><button class="gform-button gform-button--white">Download PDF into Media Library</button></p>'
-								);
-							} else {
-								resetFieldError( 'pdf_url_setting' );
-							}
-						}
-
-					});
-				});
-				// Fire input events so errors show as soon as the field is selected.
-				el.dispatchEvent(new Event('input'));
-			}
-		});
-
-		// Launch an upload media modal when the Choose PDF button is clicked.
-		el = document.getElementById('choose_pdf_url');
-		if ( el ) {
-			el.removeEventListener( 'click', handleChooseClick );
-			el.addEventListener( 'click', handleChooseClick );
-		}
-	});
-});
+// 	});
+// });
 
 // Choose PDF button click handler in form editor & feed settings in pro
 function handleChooseClick (e) {
