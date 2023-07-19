@@ -308,6 +308,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 			if ( empty( $url ) ) {
 				// No.
 				if ( defined( 'WPFORMS_DEBUG' ) && WPFORMS_DEBUG ) {
+					/* translators: 1: field ID, 2: form ID. */
 					$message = sprintf( __( 'No PDF to load into field %1$s on form %2$s', 'embed-pdf-wpforms' ), $field_id, $form_id );
 					wpforms_log(
 						__( 'Embed PDF for WPForms', 'embed-pdf-wpforms' ),
