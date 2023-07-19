@@ -375,14 +375,16 @@ if ( class_exists( 'WPForms_Field' ) ) {
 					// Zoom controls.
 					. '<span class="zoom"><button class="wpforms-page-button button" onclick="return false" id="%1$s_zoom_out" data-viewer-id="%7$s" title="%5$s">%5$s</button> <button class="wpforms-page-button button" onclick="return false" id="%1$s_zoom_in" data-viewer-id="%7$s" title="%6$s">%6$s</button></span>'
 					. '</div>'
-					. '<div class="epgf-container"><canvas id="%1$s" class="epgf"></canvas></div>',
+					. '<div class="epgf-container"><canvas id="%1$s" class="epgf"></canvas></div>'
+					. '<input type="hidden" name="wpforms[fields][%7$s]" value="%8$s" />',
 				esc_attr( $canvas_id ),
 				esc_html__( 'Previous', 'embed-pdf-gravityforms' ),
 				esc_html__( 'Next', 'embed-pdf-gravityforms' ),
 				esc_html__( 'Page:', 'embed-pdf-gravityforms' ),
 				esc_html__( 'Zoom Out', 'embed-pdf-gravityforms' ),
 				esc_html__( 'Zoom In', 'embed-pdf-gravityforms' ),
-				esc_attr( $field_id )
+				esc_attr( $field_id ),
+				esc_attr( $url )
 			)
 				. "<script type=\"text/javascript\">
 			var epgf_{$field_id} = {
