@@ -42,7 +42,7 @@ function embed_pdf_wpforms_init() {
  * Adds our field type to the list of field types WPForms recognizes as
  * valid.
  *
- * @param  array $allowed_form_fields
+ * @param  array $allowed_form_fields Allow list of field types.
  * @return array
  */
 function embed_pdf_wpforms_field_types( $allowed_form_fields ) {

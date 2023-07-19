@@ -1,4 +1,10 @@
 <?php
+/**
+ * WPForms_Field_PDF_Viewer
+ *
+ * @package embed-pdf-wpforms
+ */
+
 defined( 'ABSPATH' ) || exit;
 
 if ( class_exists( 'WPForms_Field' ) ) {
@@ -44,27 +50,10 @@ if ( class_exists( 'WPForms_Field' ) ) {
 		public function init() {
 
 			// Define field type information.
-			$this->name     = esc_html__( 'PDF Viewer', 'embed-pdf-wpforms' );
-			$this->type     = 'pdf_viewer';
-			$this->icon     = 'fa-caret-square-o-down';
-			$this->order    = 200;
-			// $this->defaults = array(
-			// 	1 => array(
-			// 		'label'   => esc_html__( 'First Choice', 'embed-pdf-wpforms' ),
-			// 		'value'   => '',
-			// 		'default' => '',
-			// 	),
-			// 	2 => array(
-			// 		'label'   => esc_html__( 'Second Choice', 'embed-pdf-wpforms' ),
-			// 		'value'   => '',
-			// 		'default' => '',
-			// 	),
-			// 	3 => array(
-			// 		'label'   => esc_html__( 'Third Choice', 'embed-pdf-wpforms' ),
-			// 		'value'   => '',
-			// 		'default' => '',
-			// 	),
-			// );
+			$this->name  = esc_html__( 'PDF Viewer', 'embed-pdf-wpforms' );
+			$this->type  = 'pdf_viewer';
+			$this->icon  = 'fa-caret-square-o-down';
+			$this->order = 200;
 
 			// Define additional field properties.
 			add_filter( 'wpforms_field_properties_' . $this->type, array( $this, 'field_properties' ), 5, 3 );
@@ -106,40 +95,6 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				),
 			);
 
-			// Set properties.
-			// foreach ( $choices as $key => $choice ) {
-
-			// 	// Used for dynamic choices.
-			// 	$depth = 1;
-
-			// 	$properties['inputs'][ $key ] = array(
-			// 		'container' => array(
-			// 			'attr'  => array(),
-			// 			'class' => array( "choice-{$key}", "depth-{$depth}" ),
-			// 			'data'  => array(),
-			// 			'id'    => '',
-			// 		),
-			// 		'label'     => array(
-			// 			'attr'  => array(
-			// 				'for' => "wpforms-{$form_id}-field_{$field_id}_{$key}",
-			// 			),
-			// 			'class' => array( 'wpforms-field-label-inline' ),
-			// 			'data'  => array(),
-			// 			'id'    => '',
-			// 			'text'  => $choice['label'],
-			// 		),
-			// 		'attr'      => array(
-			// 			'name'  => "wpforms[fields][{$field_id}]",
-			// 			'value' => isset( $field['show_values'] ) ? $choice['value'] : $choice['label'],
-			// 		),
-			// 		'class'     => array(),
-			// 		'data'      => array(),
-			// 		'id'        => "wpforms-{$form_id}-field_{$field_id}_{$key}",
-			// 		'required'  => ! empty( $field['required'] ) ? 'required' : '',
-			// 		'default'   => isset( $choice['default'] ),
-			// 	);
-			// }
-
 			// Add class that changes the field size.
 			if ( ! empty( $field['size'] ) ) {
 				$properties['input_container']['class'][] = 'wpforms-field-' . esc_attr( $field['size'] );
@@ -169,10 +124,9 @@ if ( class_exists( 'WPForms_Field' ) ) {
 		 * @param array $field Field settings.
 		 */
 		public function field_options( $field ) {
-
 			/*
-			* Basic field options.
-			*/
+			 * Basic field options.
+			 */
 
 			// Options open markup.
 			$this->field_option(
@@ -451,7 +405,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 
 			// If show_values is true, that means values posted are the raw values
 			// and not the labels. So we need to get the label values.
-			if ( ! empty( $field['show_values'] ) && (int) $field['show_values'] === 1 ) {
+			if ( ! empty( $field['show_values'] ) && 1 === (int) $field['show_values'] ) {
 
 				foreach ( $field_submit as $item ) {
 					foreach ( $field['choices'] as $choice ) {
@@ -547,7 +501,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				);
 				wp_add_inline_script(
 					$handle,
-					'const epgf_pdfjs_strings = ' . json_encode(
+					'const epgf_pdfjs_strings = ' . wp_json_encode(
 						array(
 							'url_worker'        => plugins_url( 'js/pdfjs/pdf.worker.min.js', EMBED_PDF_WPFORMS_PATH ), // No unminimized version of this script included.
 							'initial_scale'     => self::DEFAULT_SCALE_VALUE,
@@ -568,7 +522,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				);
 				wp_add_inline_script(
 					$handle,
-					'const epgf_pdf_viewer_strings = ' . json_encode(
+					'const epgf_pdf_viewer_strings = ' . wp_json_encode(
 						array(
 							'site_url' => site_url(),
 						)
