@@ -1,0 +1,7 @@
+/* Text box next to the Choose PDF button */
+.wpforms-field-option-row.wpforms-field-option-row-pdf_url input[type="text"].pdf-url{
+	width: 68%;
+	margin-left: .5em;
+	position: relative;
+	top: 2px;
+}

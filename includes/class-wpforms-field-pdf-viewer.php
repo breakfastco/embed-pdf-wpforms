@@ -76,6 +76,8 @@ if ( class_exists( 'WPForms_Field' ) ) {
 			add_action( 'wpforms_frontend_js', array( $this, 'load_js' ) );
 
 			add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_block_editor_assets' ) );
+
+			add_action( 'wpforms_builder_enqueues', array( $this, 'enqueue_css_builder' ) );
 		}
 
 		/**
@@ -186,6 +188,70 @@ if ( class_exists( 'WPForms_Field' ) ) {
 
 			// Description.
 			$this->field_option( 'description', $field );
+
+			// PDF URL.
+			// [ Choose PDF ] [ https://breakfastco.test/wp-cont].
+			$lbl = $this->field_element(
+				'label',
+				$field,
+				array(
+					'slug'    => 'pdf_url',
+					'value'   => esc_html__( 'PDF', 'embed-pdf-wpforms' ),
+					'tooltip' => esc_html__( 'Enter the URL of the PDF to load into the viewer.', 'embed-pdf-wpforms' ),
+				),
+				false
+			);
+			$fld = $this->field_element(
+				'text',
+				$field,
+				array(
+					'slug'  => 'pdf_url',
+					'value' => ! empty( $field['pdf_url'] ) ? $field['pdf_url'] : '',
+					'class' => 'pdf-url',
+				),
+				false
+			);
+			$this->field_element(
+				'row',
+				$field,
+				array(
+					'slug'    => 'pdf_url',
+					'content' => $lbl . '<button class="wpforms-btn wpforms-btn-sm wpforms-btn-blue">Choose PDF</button>' . $fld,
+				)
+			);
+			// PDF URL end.
+
+			// Initial Scale.
+			$lbl = $this->field_element(
+				'label',
+				$field,
+				array(
+					'slug'    => 'initial_scale',
+					'value'   => esc_html__( 'Initial Scale', 'embed-pdf-wpforms' ),
+					'tooltip' => esc_html__( 'Loading too small to read? Increase this value to zoom in.', 'embed-pdf-wpforms' ),
+				),
+				false
+			);
+			$fld = $this->field_element(
+				'text',
+				$field,
+				array(
+					'slug'  => 'initial_scale',
+					'type'  => 'number',
+					'value' => ! empty( $field['initial_scale'] ) ? $field['initial_scale'] : '',
+					'class' => 'initial-scale',
+				),
+				false
+			);
+			$this->field_element(
+				'row',
+				$field,
+				array(
+					'slug'    => 'initial_scale',
+					'content' => $lbl . $fld . '<small>' . esc_html__( 'Loading too small to read? Increase this value to zoom in.', 'embed-pdf-wpforms' ) . '</small>',
+				)
+			);
+			// Initial Scale end.
 
 			// Required toggle.
 			$this->field_option( 'required', $field );
@@ -313,49 +379,12 @@ if ( class_exists( 'WPForms_Field' ) ) {
 
 			$label = ! empty( $field['name'] ) ? $field['name'] : '';
 			?>
-
 			<label class="label-title">
 				<div class="text"><?php echo esc_html( $label ); ?></div>
 				<div class="grey"><i class="fa fa-code"></i> <?php esc_html_e( 'PDF Viewer', 'embed-pdf-wpforms' ); ?></div>
 			</label>
 			<div class="description"><?php esc_html_e( 'Contents of this field are not displayed in the form builder preview.', 'embed-pdf-wpforms' ); ?></div>
-
 			<?php
-
-			// $args = array();
-
-			// // Label.
-			// $this->field_preview_option( 'label', $field );
-
-			// // Prepare arguments.
-			// $args['modern'] = false;
-
-			// if (
-			// 	! empty( $field['style'] ) &&
-			// 	self::STYLE_MODERN === $field['style']
-			// ) {
-			// 	$args['modern'] = true;
-			// 	$args['class']  = 'choicesjs-select';
-			// }
-
-			// // Choices.
-			// // The field preview in the form editor should work even if we have no vehicles.
-			// $field['choices'] = array(
-			// 	array(
-			// 		'label'      => '2016 BMW 428i, Black Sapphire Metallic, #GW228041',
-			// 		'value'      => '2016 BMW 428i, GW228041',
-			// 		'image'      => '',
-			// 		'icon'       => 'face-smile',
-			// 		'icon_style' => 'regular',
-			// 	),
-			// );
-
-			// // Change our field type to select so the preview works
-			// $field['type'] = 'select';
-			// $this->field_preview_option( 'choices', $field, $args );
-
-			// // Description.
-			// $this->field_preview_option( 'description', $field );
 		}
 
 		/**
@@ -449,82 +478,6 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				wpforms_html_attributes( $primary['id'], $primary['class'], $primary['data'], $primary['attr'] ),
 				$canvas_controls
 			);
-
-			// Select field code.
-			// $container         = $field['properties']['input_container'];
-			// $field_placeholder = ! empty( $field['placeholder'] ) ? $field['placeholder'] : '';
-			// $is_multiple       = ! empty( $field['multiple'] );
-			// $is_modern         = ! empty( $field['style'] ) && self::STYLE_MODERN === $field['style'];
-			// $choices           = $field['properties']['inputs'];
-
-			// if ( ! empty( $field['required'] ) ) {
-			// 	$container['attr']['required'] = 'required';
-			// }
-
-			// // If it's a multiple select.
-			// if ( $is_multiple ) {
-			// 	$container['attr']['multiple'] = 'multiple';
-
-			// 	// Change a name attribute.
-			// 	if ( ! empty( $container['attr']['name'] ) ) {
-			// 		$container['attr']['name'] .= '[]';
-			// 	}
-			// }
-
-			// // Add a class for Choices.js initialization.
-			// if ( $is_modern ) {
-			// 	$container['class'][] = 'choicesjs-select';
-
-			// 	// Add a size-class to data attribute - it is used when Choices.js is initialized.
-			// 	if ( ! empty( $field['size'] ) ) {
-			// 		$container['data']['size-class'] = 'wpforms-field-row wpforms-field-' . sanitize_html_class( $field['size'] );
-			// 	}
-
-			// 	$container['data']['search-enabled'] = $this->is_choicesjs_search_enabled( count( $choices ) );
-			// }
-
-			// $has_default = false;
-
-			// // Check to see if any of the options were selected by default.
-			// foreach ( $choices as $choice ) {
-			// 	if ( ! empty( $choice['default'] ) ) {
-			// 		$has_default = true;
-			// 		break;
-			// 	}
-			// }
-
-			// // Fake placeholder for Modern style.
-			// if ( $is_modern && empty( $field_placeholder ) ) {
-			// 	$first_choices     = reset( $choices );
-			// 	$field_placeholder = $first_choices['label']['text'];
-			// }
-
-			// // Preselect default if no other choices were marked as default.
-			// printf(
-			// 	'<select %s>',
-			// 	wpforms_html_attributes( $container['id'], $container['class'], $container['data'], $container['attr'] )
-			// );
-
-			// // Optional placeholder.
-			// if ( ! empty( $field_placeholder ) ) {
-			// 	printf(
-			// 		'<option value="" class="placeholder" disabled %s>%s</option>',
-			// 		selected( false, $has_default || $is_multiple, false ),
-			// 		esc_html( $field_placeholder )
-			// 	);
-			// }
-
-			// // Build the select options.
-			// foreach ( $choices as $key => $choice ) {
-			// 	printf(
-			// 		'<option value="%s" %s>%s</option>',
-			// 		esc_attr( $choice['attr']['value'] ),
-			// 		selected( true, ! empty( $choice['default'] ), false ),
-			// 		esc_html( $choice['label']['text'] )
-			// 	);
-			// }
-
-			// echo '</select>';
 		}
 
 		/**
@@ -592,6 +545,21 @@ if ( class_exists( 'WPForms_Field' ) ) {
 		}
 
 		/**
+		 * Enqueue assets for the builder.
+		 *
+		 * @param string|null $view Current view.
+		 */
+		public function enqueue_css_builder( $view = null ) {
+			$min = wpforms_get_min_suffix();
+			wp_enqueue_style(
+				'wpforms-builder-embed-pdf',
+				plugins_url( "css/editor{$min}.css", EMBED_PDF_WPFORMS_PATH ),
+				array( 'wpforms-builder-fields' ),
+				EMBED_PDF_WPFORMS_VERSION
+			);
+		}
+
+		/**
 		 * Form frontend CSS enqueues.
 		 *
 		 * @since 1.6.1
@@ -656,7 +624,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				);
 
 				$handle = 'epgf_pdf_viewer';
-				$min    = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+				$min    = wpforms_get_min_suffix();
 				wp_enqueue_script(
 					$handle,
 					plugins_url( "js/field-pdf-viewer{$min}.js", EMBED_PDF_WPFORMS_PATH ),
