@@ -16,30 +16,10 @@ if ( class_exists( 'WPForms_Field' ) ) {
 	class WPForms_Field_PDF_Viewer extends WPForms_Field {
 
 		/**
-		 * Choices JS version.
-		 *
-		 * @since 1.6.3
-		 */
-		const CHOICES_VERSION = '9.0.1';
-
-		/**
-		 * Classic (old) style.
-		 *
-		 * @since 1.6.1
+		 * Default value for the Initial Scale setting.
 		 *
 		 * @var string
 		 */
-		const STYLE_CLASSIC = 'classic';
-
-		/**
-		 * Modern style.
-		 *
-		 * @since 1.6.1
-		 *
-		 * @var string
-		 */
-		const STYLE_MODERN = 'modern';
-
 		const DEFAULT_SCALE_VALUE = '1';
 
 		/**
@@ -59,7 +39,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 			add_filter( 'wpforms_field_properties_' . $this->type, array( $this, 'field_properties' ), 5, 3 );
 
 			// Form frontend CSS enqueues.
-			add_action( 'wpforms_frontend_css', array( $this, 'enqueue_frontend_css' ) );
+			add_action( 'wpforms_frontend_css', array( $this, 'enqueue_css_frontend' ) );
 
 			// Form frontend JS enqueues.
 			add_action( 'wpforms_frontend_js', array( $this, 'load_js' ) );
@@ -361,10 +341,12 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				});
 			</script>";
 
+			$primary['class'][] = 'wpforms-container-pdf-viewer';
+
 			// Primary field.
 			printf(
 				'<div %s>%s</div>',
-				wpforms_html_attributes( $primary['id'], $primary['class'], $primary['data'], $primary['attr'] ),
+				wpforms_html_attributes( $primary['id'], $primary['class'], $primary['data'] ),
 				$canvas_controls
 			);
 		}
@@ -455,28 +437,14 @@ if ( class_exists( 'WPForms_Field' ) ) {
 		 *
 		 * @param array $forms Forms on the current page.
 		 */
-		public function enqueue_frontend_css( $forms ) {
-
-			$has_modern_select = false;
-
-			foreach ( $forms as $form ) {
-				if ( $this->is_field_style( $form, self::STYLE_MODERN ) ) {
-					$has_modern_select = true;
-
-					break;
-				}
-			}
-
-			if ( $has_modern_select || wpforms()->frontend->assets_global() ) {
-				$min = wpforms_get_min_suffix();
-
-				wp_enqueue_style(
-					'wpforms-choicesjs',
-					WPFORMS_PLUGIN_URL . "assets/css/choices{$min}.css",
-					array(),
-					self::CHOICES_VERSION
-				);
-			}
+		public function enqueue_css_frontend( $forms ) {
+			$min = wpforms_get_min_suffix();
+			wp_enqueue_style(
+				'wpforms-embed-pdf',
+				plugins_url( "css/viewer{$min}.css", EMBED_PDF_WPFORMS_PATH ),
+				array(),
+				EMBED_PDF_WPFORMS_VERSION
+			);
 		}
 
 		/**

@@ -1,0 +1,41 @@
+div.wpforms-container-full div.epgf-container{
+	overflow: auto; /* Allow scolling to see PDFs larger than the display viewport */
+}
+canvas.epgf{
+	width: auto;
+}
+
+/* Input wrapper gets a light grey border and background to contrast controls and document */
+div.wpforms-container-full .wpforms-container-pdf-viewer{
+	border: 1px solid #eaeaea;
+	background-color: #f9f9f9;
+	padding: 1em;
+}
+/* Border around the actual PDF */
+.wpforms-container-pdf-viewer canvas.epgf{
+	border: 1px solid #e6e6e6;
+}
+
+/* Space between controls and the top of the PDF */
+div.wpforms-container-full .epgf-controls-container{
+	padding-bottom: .95em;
+	line-height: 3em; /* If the controls wrap to multiple lines */
+}
+/* Space between buttons and "Page: 1 / 2" */
+.epgf-controls-container span.paging{
+	padding-left: 1em;
+	padding-right: 1em;
+}
+/* Wrap the Zoom In and Out buttons on smaller screens */
+@media (max-width: 768px ) {
+	.epgf-controls-container span.zoom{
+		display: block;
+	}
+}
+/* Wrap the "Page: 1 / 2" on smaller screens */
+@media (max-width: 480px ) {
+	.epgf-controls-container span.paging{
+		display: block;
+		padding-left: .3em;
+	}
+}
