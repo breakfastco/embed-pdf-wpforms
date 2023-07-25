@@ -172,7 +172,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				array(
 					'slug'  => 'initial_scale',
 					'type'  => 'number',
-					'value' => ! empty( $field['initial_scale'] ) ? $field['initial_scale'] : '',
+					'value' => ! empty( $field['initial_scale'] ) ? $field['initial_scale'] : self::DEFAULT_SCALE_VALUE,
 					'class' => 'initial-scale',
 				),
 				false
