@@ -237,12 +237,17 @@ if ( class_exists( 'WPForms_Field' ) ) {
 		 * @param array $field Field settings.
 		 */
 		public function field_preview( $field ) {
-
-			$label = ! empty( $field['name'] ) ? $field['name'] : '';
 			?>
 			<label class="label-title">
-				<div class="text"><?php echo esc_html( $label ); ?></div>
-				<div class="grey"><i class="fa fa-code"></i> <?php esc_html_e( 'PDF Viewer', 'embed-pdf-wpforms' ); ?></div>
+				<div class="grey text"><?php
+
+				if ( ! empty( $field['label'] ) && __( 'PDF Viewer', 'embed-pdf-wpforms' ) !== $field['label'] ) {
+					echo esc_html( $field['label'] );
+				} else {
+					echo '<i class="fa fa-code"></i> ' . esc_html__( 'PDF Viewer', 'embed-pdf-wpforms' );
+				}
+
+				?></div>
 			</label>
 			<div class="description"><?php esc_html_e( 'Contents of this field are not displayed in the form builder preview.', 'embed-pdf-wpforms' ); ?></div>
 			<?php
