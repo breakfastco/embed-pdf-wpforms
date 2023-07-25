@@ -9,9 +9,9 @@ function handleChooseClick (e) {
 	e.preventDefault();
 	const { __ } = wp.i18n;
 	var file_frame = wp.media.frames.file_frame = wp.media({
-		title: __( 'Choose PDF', 'embed-pdf-gravityforms' ),
+		title: __( 'Choose PDF', 'embed-pdf-wpforms' ),
 		button: {
-			text: __( 'Load', 'embed-pdf-gravityforms' )
+			text: __( 'Load', 'embed-pdf-wpforms' )
 		},
 		frame: 'select',
 		multiple: false
@@ -208,9 +208,9 @@ function loadPreview( fieldId, formId ) {
 		const el = document.querySelector('#' + fieldElementId + ' .ginput_container_pdf_viewer');
 		if ( el && error.message ) {
 			const { __ } = wp.i18n;
-			var msg = '<p><b>' + __( 'PDF Viewer Error:', 'embed-pdf-gravityforms' ) + '</b> ' + error.message;
+			var msg = '<p><b>' + __( 'PDF Viewer Error:', 'embed-pdf-wpforms' ) + '</b> ' + error.message;
 			if ( epgf_pdfjs_strings.is_user_logged_in ) {
-				msg += ' <a href="https://breakfastco.xyz/embed-pdf-for-gravity-forms/#troubleshooting">' + __( 'Troubleshooting →', 'embed-pdf-gravityforms' ) + '</a>';
+				msg += ' <a href="https://breakfastco.xyz/embed-pdf-for-gravity-forms/#troubleshooting">' + __( 'Troubleshooting →', 'embed-pdf-wpforms' ) + '</a>';
 			}
 			msg += '</p>';
 			el.innerHTML += msg;
