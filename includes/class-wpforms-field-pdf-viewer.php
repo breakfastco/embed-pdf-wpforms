@@ -38,15 +38,13 @@ if ( class_exists( 'WPForms_Field' ) ) {
 			// Define additional field properties.
 			add_filter( 'wpforms_field_properties_' . $this->type, array( $this, 'field_properties' ), 5, 3 );
 
-			// Form frontend CSS enqueues.
+			// Form frontend enqueues.
 			add_action( 'wpforms_frontend_css', array( $this, 'enqueue_css_frontend' ) );
-
-			// Form frontend JS enqueues.
 			add_action( 'wpforms_frontend_js', array( $this, 'load_js' ) );
 
 			add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_block_editor_assets' ) );
 
-			add_action( 'wpforms_builder_enqueues', array( $this, 'enqueue_css_builder' ) );
+			add_action( 'wpforms_builder_enqueues', array( $this, 'enqueue_assets_builder' ) );
 		}
 
 		/**
@@ -425,11 +423,11 @@ if ( class_exists( 'WPForms_Field' ) ) {
 		}
 
 		/**
-		 * Enqueue assets for the builder.
+		 * Enqueue CSS and JS for the builder.
 		 *
 		 * @param string|null $view Current view.
 		 */
-		public function enqueue_css_builder( $view = null ) {
+		public function enqueue_assets_builder( $view = null ) {
 			$min = wpforms_get_min_suffix();
 			wp_enqueue_style(
 				'wpforms-builder-embed-pdf',
@@ -437,6 +435,8 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				array( 'wpforms-builder-fields' ),
 				EMBED_PDF_WPFORMS_VERSION
 			);
+
+			$this->enqueue_js_viewer();
 		}
 
 		/**
@@ -488,26 +488,35 @@ if ( class_exists( 'WPForms_Field' ) ) {
 					),
 					'before'
 				);
-
-				$handle = 'epgf_pdf_viewer';
-				$min    = wpforms_get_min_suffix();
-				wp_enqueue_script(
-					$handle,
-					plugins_url( "js/field-pdf-viewer{$min}.js", EMBED_PDF_WPFORMS_PATH ),
-					array( 'wp-i18n', 'epgf_pdfjs', 'jquery' ),
-					EMBED_PDF_WPFORMS_VERSION,
-					true
-				);
-				wp_add_inline_script(
-					$handle,
-					'const epgf_pdf_viewer_strings = ' . wp_json_encode(
-						array(
-							'site_url' => site_url(),
-						)
-					),
-					'before'
-				);
+				$this->enqueue_viewer_js();
 			}
+		}
+
+		/**
+		 * Adds our JavaScript file that powers the viewer, the Choose PDF
+		 * button click, and the CORS warning.
+		 *
+		 * @return void
+		 */
+		protected function enqueue_js_viewer() {
+			$handle = 'epgf_pdf_viewer';
+			$min    = wpforms_get_min_suffix();
+			wp_enqueue_script(
+				$handle,
+				plugins_url( "js/field-pdf-viewer{$min}.js", EMBED_PDF_WPFORMS_PATH ),
+				array( 'wp-i18n', 'epgf_pdfjs', 'jquery' ),
+				EMBED_PDF_WPFORMS_VERSION,
+				true
+			);
+			wp_add_inline_script(
+				$handle,
+				'const epgf_pdf_viewer_strings = ' . wp_json_encode(
+					array(
+						'site_url' => site_url(),
+					)
+				),
+				'before'
+			);
 		}
 
 		/**

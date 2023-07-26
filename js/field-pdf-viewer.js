@@ -1,8 +1,13 @@
-// jQuery( document ).on( 'wpformsReady', ( event ) => {
-// 	jQuery('.wpforms-field-pdf_viewer').each( ( field ) => { 
+jQuery( document ).on( 'wpformsReady', ( event ) => {
+	var el = document.querySelector( '.wpforms-field-option-row-pdf_url button' );
+	if ( el ) {
+		el.removeEventListener( 'click', handleChooseClick );
+		el.addEventListener( 'click', handleChooseClick );
+	}
+	// jQuery('.wpforms-field-pdf_viewer').each( ( field ) => { 
 
-// 	});
-// });
+	// });
+});
 
 // Choose PDF button click handler in form editor & feed settings in pro
 function handleChooseClick (e) {
