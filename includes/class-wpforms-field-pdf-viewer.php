@@ -310,14 +310,14 @@ if ( class_exists( 'WPForms_Field' ) ) {
 			}
 
 			$canvas_controls = sprintf(
-				'<div class="epgf-controls-container">'
+				'<div class="epdf-controls-container">'
 					// Paging controls.
 					. '<button class="wpforms-page-button button" onclick="return false" id="%1$s_prev" data-viewer-id="%7$s" title="%2$s">%2$s</button> <button class="wpforms-page-button button" onclick="return false" id="%1$s_next" data-viewer-id="%7$s" title="%3$s">%3$s</button> '
 					. '<span class="paging">%4$s <span id="%1$s_page_num"></span> / <span id="%1$s_page_count"></span></span> '
 					// Zoom controls.
 					. '<span class="zoom"><button class="wpforms-page-button button" onclick="return false" id="%1$s_zoom_out" data-viewer-id="%7$s" title="%5$s">%5$s</button> <button class="wpforms-page-button button" onclick="return false" id="%1$s_zoom_in" data-viewer-id="%7$s" title="%6$s">%6$s</button></span>'
 					. '</div>'
-					. '<div class="epgf-container"><canvas id="%1$s" class="epgf"></canvas></div>'
+					. '<div class="epdf-container"><canvas id="%1$s" class="epdf"></canvas></div>'
 					. '<input type="hidden" name="wpforms[fields][%7$s]" value="%8$s" />',
 				esc_attr( $canvas_id ),
 				esc_html__( 'Previous', 'embed-pdf-wpforms' ),
@@ -329,10 +329,10 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				esc_attr( $url )
 			)
 				. "<script type=\"text/javascript\">
-			var epgf_{$field_id} = {
+			var epdf_{$field_id} = {
 					canvas: document.getElementById('{$canvas_id}'),
 					canvasId: '{$canvas_id}',
-					initialScale: {$initial_scale} ?? epgf_pdfjs_strings.initialScale,
+					initialScale: {$initial_scale} ?? epdf_wf_pdfjs_strings.initialScale,
 					pageNum: 1,
 					pageNumPending: null,
 					pageRendering: false,
@@ -469,7 +469,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				wpforms_has_field_type( 'pdf_viewer', $forms, true ) ||
 				wpforms()->get( 'frontend' )->assets_global()
 			) {
-				$handle = 'epgf_pdfjs';
+				$handle = 'epdf_wf_pdfjs';
 				wp_enqueue_script(
 					$handle,
 					plugins_url( 'js/pdfjs/pdf.min.js', EMBED_PDF_WPFORMS_PATH ), // No un-minimized version of this script included.
@@ -479,7 +479,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				);
 				wp_add_inline_script(
 					$handle,
-					'const epgf_pdfjs_strings = ' . wp_json_encode(
+					'const epdf_wf_pdfjs_strings = ' . wp_json_encode(
 						array(
 							'url_worker'        => plugins_url( 'js/pdfjs/pdf.worker.min.js', EMBED_PDF_WPFORMS_PATH ), // No unminimized version of this script included.
 							'initial_scale'     => self::DEFAULT_SCALE_VALUE,
@@ -488,7 +488,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 					),
 					'before'
 				);
-				$this->enqueue_viewer_js();
+				$this->enqueue_js_viewer();
 			}
 		}
 
@@ -499,18 +499,18 @@ if ( class_exists( 'WPForms_Field' ) ) {
 		 * @return void
 		 */
 		protected function enqueue_js_viewer() {
-			$handle = 'epgf_pdf_viewer';
+			$handle = 'epdf_wf_pdf_viewer';
 			$min    = wpforms_get_min_suffix();
 			wp_enqueue_script(
 				$handle,
 				plugins_url( "js/field-pdf-viewer{$min}.js", EMBED_PDF_WPFORMS_PATH ),
-				array( 'wp-i18n', 'epgf_pdfjs', 'jquery' ),
+				array( 'wp-i18n', 'epdf_wf_pdfjs', 'jquery' ),
 				EMBED_PDF_WPFORMS_VERSION,
 				true
 			);
 			wp_add_inline_script(
 				$handle,
-				'const epgf_pdf_viewer_strings = ' . wp_json_encode(
+				'const epdf_wf_pdf_viewer_strings = ' . wp_json_encode(
 					array(
 						'site_url' => site_url(),
 					)
