@@ -38,13 +38,81 @@ if ( class_exists( 'WPForms_Field' ) ) {
 			// Define additional field properties.
 			add_filter( 'wpforms_field_properties_' . $this->type, array( $this, 'field_properties' ), 5, 3 );
 
+			// Register our JS & CSS assets.
+			add_action( 'wp_enqueue_scripts', array( $this, 'assets_register' ) );
+			add_action( 'admin_enqueue_scripts', array( $this, 'assets_register' ) );
+
 			// Form frontend enqueues.
 			add_action( 'wpforms_frontend_css', array( $this, 'enqueue_css_frontend' ) );
 			add_action( 'wpforms_frontend_js', array( $this, 'load_js' ) );
 
 			add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_block_editor_assets' ) );
-
 			add_action( 'wpforms_builder_enqueues', array( $this, 'enqueue_assets_builder' ) );
+		}
+
+		/**
+		 * Registers our scripts and styles so they can be enqueued whenever
+		 * they are needed.
+		 *
+		 * @return void
+		 */
+		public function assets_register() {
+			// pdf.js.
+			$handle = 'epdf_wf_pdfjs';
+			wp_register_script(
+				$handle,
+				plugins_url( 'js/pdfjs/pdf.min.js', EMBED_PDF_WPFORMS_PATH ), // No un-minimized version of this script included.
+				array(),
+				EMBED_PDF_WPFORMS_VERSION,
+				true
+			);
+			wp_add_inline_script(
+				$handle,
+				'const epdf_wf_pdfjs_strings = ' . wp_json_encode(
+					array(
+						'url_worker'        => plugins_url( 'js/pdfjs/pdf.worker.min.js', EMBED_PDF_WPFORMS_PATH ), // No unminimized version of this script included.
+						'initial_scale'     => self::DEFAULT_SCALE_VALUE,
+						'is_user_logged_in' => is_user_logged_in(),
+					)
+				),
+				'before'
+			);
+
+			// Our viewer JavaScript, including front-end and Builder controls.
+			$handle = 'epdf_wf_pdf_viewer';
+			$min    = wpforms_get_min_suffix();
+			wp_register_script(
+				$handle,
+				plugins_url( "js/field-pdf-viewer{$min}.js", EMBED_PDF_WPFORMS_PATH ),
+				array( 'wp-i18n', 'epdf_wf_pdfjs', 'jquery' ),
+				EMBED_PDF_WPFORMS_VERSION,
+				true
+			);
+			wp_add_inline_script(
+				$handle,
+				'const epdf_wf_pdf_viewer_strings = ' . wp_json_encode(
+					array(
+						'site_url' => site_url(),
+					)
+				),
+				'before'
+			);
+
+			// CSS for the Builder.
+			wp_register_style(
+				'wpforms-builder-embed-pdf',
+				plugins_url( "css/editor{$min}.css", EMBED_PDF_WPFORMS_PATH ),
+				array( 'wpforms-builder-fields' ),
+				EMBED_PDF_WPFORMS_VERSION
+			);
+
+			// CSS for the front-end.
+			wp_register_style(
+				'wpforms-embed-pdf',
+				plugins_url( "css/viewer{$min}.css", EMBED_PDF_WPFORMS_PATH ),
+				array(),
+				EMBED_PDF_WPFORMS_VERSION
+			);
 		}
 
 		/**
@@ -428,15 +496,8 @@ if ( class_exists( 'WPForms_Field' ) ) {
 		 * @param string|null $view Current view.
 		 */
 		public function enqueue_assets_builder( $view = null ) {
-			$min = wpforms_get_min_suffix();
-			wp_enqueue_style(
-				'wpforms-builder-embed-pdf',
-				plugins_url( "css/editor{$min}.css", EMBED_PDF_WPFORMS_PATH ),
-				array( 'wpforms-builder-fields' ),
-				EMBED_PDF_WPFORMS_VERSION
-			);
-
-			$this->enqueue_js_viewer();
+			wp_enqueue_style( 'wpforms-builder-embed-pdf' );
+			wp_enqueue_script( 'epdf_wf_pdf_viewer' );
 		}
 
 		/**
@@ -447,13 +508,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 		 * @param array $forms Forms on the current page.
 		 */
 		public function enqueue_css_frontend( $forms ) {
-			$min = wpforms_get_min_suffix();
-			wp_enqueue_style(
-				'wpforms-embed-pdf',
-				plugins_url( "css/viewer{$min}.css", EMBED_PDF_WPFORMS_PATH ),
-				array(),
-				EMBED_PDF_WPFORMS_VERSION
-			);
+			wp_enqueue_style( 'wpforms-embed-pdf' );
 		}
 
 		/**
@@ -469,54 +524,9 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				wpforms_has_field_type( 'pdf_viewer', $forms, true ) ||
 				wpforms()->get( 'frontend' )->assets_global()
 			) {
-				$handle = 'epdf_wf_pdfjs';
-				wp_enqueue_script(
-					$handle,
-					plugins_url( 'js/pdfjs/pdf.min.js', EMBED_PDF_WPFORMS_PATH ), // No un-minimized version of this script included.
-					array(),
-					EMBED_PDF_WPFORMS_VERSION,
-					true
-				);
-				wp_add_inline_script(
-					$handle,
-					'const epdf_wf_pdfjs_strings = ' . wp_json_encode(
-						array(
-							'url_worker'        => plugins_url( 'js/pdfjs/pdf.worker.min.js', EMBED_PDF_WPFORMS_PATH ), // No unminimized version of this script included.
-							'initial_scale'     => self::DEFAULT_SCALE_VALUE,
-							'is_user_logged_in' => is_user_logged_in(),
-						)
-					),
-					'before'
-				);
-				$this->enqueue_js_viewer();
+				wp_enqueue_script( 'epdf_wf_pdfjs' );
+				wp_enqueue_script( 'epdf_wf_pdf_viewer' );
 			}
-		}
-
-		/**
-		 * Adds our JavaScript file that powers the viewer, the Choose PDF
-		 * button click, and the CORS warning.
-		 *
-		 * @return void
-		 */
-		protected function enqueue_js_viewer() {
-			$handle = 'epdf_wf_pdf_viewer';
-			$min    = wpforms_get_min_suffix();
-			wp_enqueue_script(
-				$handle,
-				plugins_url( "js/field-pdf-viewer{$min}.js", EMBED_PDF_WPFORMS_PATH ),
-				array( 'wp-i18n', 'epdf_wf_pdfjs', 'jquery' ),
-				EMBED_PDF_WPFORMS_VERSION,
-				true
-			);
-			wp_add_inline_script(
-				$handle,
-				'const epdf_wf_pdf_viewer_strings = ' . wp_json_encode(
-					array(
-						'site_url' => site_url(),
-					)
-				),
-				'before'
-			);
 		}
 
 		/**
