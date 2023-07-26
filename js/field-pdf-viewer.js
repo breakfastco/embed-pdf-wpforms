@@ -1,13 +1,23 @@
-jQuery( document ).on( 'wpformsReady', ( event ) => {
-	var el = document.querySelector( '.wpforms-field-option-row-pdf_url button' );
-	if ( el ) {
-		el.removeEventListener( 'click', handleChooseClick );
-		el.addEventListener( 'click', handleChooseClick );
-	}
-	// jQuery('.wpforms-field-pdf_viewer').each( ( field ) => { 
+// jQuery( document ).on( 'wpformsReady', ( event ) => {
+// 	console.log( 'hello field viewers' );
+// 	jQuery('.wpforms-field-pdf_viewer').each( ( field ) => {
 
-	// });
+// 	});
+// });
+jQuery( document ).ready( function(e){
+	$builder = jQuery( '#wpforms-builder' );
+	$builder.on( 'wpformsBuilderReady', function ( evt ) {
+		var els = document.querySelectorAll( '.wpforms-field-option-row-pdf_url button' );
+		if ( els ) {
+			els.forEach( ( el ) => {
+				el.removeEventListener( 'click', handleChooseClick );
+				el.addEventListener( 'click', handleChooseClick );
+				console.log( 'added event handler' );
+			});
+		}
+	});
 });
+//const event = WPFormsUtils.triggerEvent( $builder, 'wpformsBuilderReady' );
 
 // Choose PDF button click handler in form editor & feed settings in pro
 function handleChooseClick (e) {
