@@ -205,17 +205,18 @@ function loadPreview( fieldId, formId ) {
 	}).catch(function(error){
 		console.log(error);
 		// Display an error on the front-end.
-		const el = document.querySelector('#' + fieldElementId + ' .ginput_container_pdf_viewer');
+
+		const el = document.querySelector('#wpforms-' + formId + '-field_' + fieldId + '.wpforms-container-pdf-viewer');
 		if ( el && error.message ) {
 			const { __ } = wp.i18n;
 			var msg = '<p><b>' + __( 'PDF Viewer Error:', 'embed-pdf-wpforms' ) + '</b> ' + error.message;
 			if ( epgf_pdfjs_strings.is_user_logged_in ) {
-				msg += ' <a href="https://breakfastco.xyz/embed-pdf-for-gravity-forms/#troubleshooting">' + __( 'Troubleshooting →', 'embed-pdf-wpforms' ) + '</a>';
+				msg += ' <a href="https://breakfastco.xyz/embed-pdf-for-wpforms/#troubleshooting">' + __( 'Troubleshooting →', 'embed-pdf-wpforms' ) + '</a>';
 			}
 			msg += '</p>';
 			el.innerHTML += msg;
 		}
 		// Hide the broken controls.
-		const controlEls = document.querySelectorAll( '#' + fieldElementId + ' .epgf-controls-container, #' + fieldElementId + ' .epgf-container' ).forEach( function( el ) { el.style.display ='none'; });
+		const controlEls = el.querySelectorAll( '.epgf-controls-container, .epgf-container' ).forEach( function( el ) { el.style.display ='none'; });
 	});
 }
