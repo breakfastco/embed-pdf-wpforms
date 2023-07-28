@@ -217,7 +217,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				array(
 					'slug'    => 'pdf_url',
 					'content' => $lbl
-						. '<button class="wpforms-btn wpforms-btn-sm wpforms-btn-blue">'
+						. '<button class="wpforms-btn wpforms-btn-sm wpforms-btn-blue" data-field-id="' . esc_attr( $field['id'] ) . '">'
 						. esc_html__( 'Choose PDF', 'embed-pdf-wpforms' )
 						. '</button>'
 						. $fld,

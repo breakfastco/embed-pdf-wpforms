@@ -36,10 +36,10 @@ function handleChooseClick (e) {
 	file_frame.on('select', function () {
 		// Get one image from the uploader.
 		var attachment = file_frame.state().get('selection').first().toJSON();
-		var urlEl = document.getElementById('field_pdf_url');
-		if ( ! urlEl ) {
-			urlEl = document.getElementById('url_pdf'); // Feed settings input.
-		}
+		var urlEl = document.getElementById( 'wpforms-field-option-' + e.target.dataset.fieldId + '-pdf_url' );
+		// if ( ! urlEl ) {
+		// 	urlEl = document.getElementById('url_pdf'); // Feed settings input.
+		// }
 		if ( urlEl && attachment.url ) {
 			urlEl.value = attachment.url;
 			// Fire the input event so our listener runs.
