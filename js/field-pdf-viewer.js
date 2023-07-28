@@ -7,6 +7,7 @@
 jQuery( document ).ready( function(e){
 	$builder = jQuery( '#wpforms-builder' );
 	$builder.on( 'wpformsBuilderReady', function ( evt ) {
+		// Add a click handler to the Choose PDF buttons.
 		var els = document.querySelectorAll( '.wpforms-field-option-row-pdf_url button' );
 		if ( els ) {
 			els.forEach( ( el ) => {
@@ -14,9 +15,48 @@ jQuery( document ).ready( function(e){
 				el.addEventListener( 'click', handleChooseClick );
 			});
 		}
+		// Add input handlers to the URL fields.
+		els = document.querySelectorAll( '.wpforms-field-option-row-pdf_url input.pdf-url');
+		if ( els ) {
+			els.forEach( ( el ) => {
+				el.removeEventListener( 'input', handleUrlInput );
+				el.addEventListener( 'input', handleUrlInput );
+			})
+		}
+		//
 	});
 });
-//const event = WPFormsUtils.triggerEvent( $builder, 'wpformsBuilderReady' );
+function handleUrlInput (e) {
+	e.preventDefault();
+	// Is it a valid URL?
+	if ( ! isValidHttpUrl( e.target.value ) ) {
+		// No. Add error CSS class to input so its border is red.
+		e.target.classList.add( 'wpforms-error');
+		// Add a message below the field telling the user about the problem.
+		const error = document.createElement("p");
+		error.classList.add( 'wpforms-alert-danger' );
+		error.classList.add( 'wpforms-alert' );
+		error.classList.add( 'wpforms-error-msg' );
+		const { __ } = wp.i18n;
+		error.innerHTML = __( 'Please enter a valid URL.', 'embed-pdf-wpforms' );
+		e.target.parentNode.insertBefore( error, e.target.nextSibling );
+	} else {
+		// Remove all errors for this field and the class making the fields border red.
+		e.target.classList.remove( 'wpforms-error');
+		document.querySelectorAll( '#' + e.target.parentNode.id + ' .wpforms-alert' ).forEach( ( el ) => el.remove() );
+	}
+	// Is it a local URL?
+	// } else if ( epgf_pdf_viewer_strings.site_url !== e.target.value.substring( 0, epgf_pdf_viewer_strings.site_url.length ) ) {
+	// 	const { __ } = wp.i18n;
+	// 	setFieldError(
+	// 		'pdf_url_setting',
+	// 		'below',
+	// 		__( 'Only PDFs hosted by this website and other websites listing this website in a CORS header ‘Access-Control-Allow-Origin’ can load in the viewer.', 'embed-pdf-gravityforms' )
+	// 			+ '<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">' + __( 'Learn about CORS →', 'embed-pdf-gravityforms' ) + '</a>'
+	// 			//+ '<p><button class="gform-button gform-button--white">Download PDF into Media Library</button></p>'
+	// 	);
+	// }
+}//const event = WPFormsUtils.triggerEvent( $builder, 'wpformsBuilderReady' );
 
 // Choose PDF button click handler in form editor & feed settings in pro
 function handleChooseClick (e) {
