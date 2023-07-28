@@ -12,7 +12,6 @@ jQuery( document ).ready( function(e){
 			els.forEach( ( el ) => {
 				el.removeEventListener( 'click', handleChooseClick );
 				el.addEventListener( 'click', handleChooseClick );
-				console.log( 'added event handler' );
 			});
 		}
 	});
