@@ -23,7 +23,6 @@ jQuery( document ).ready( function(e){
 				el.addEventListener( 'input', handleUrlInput );
 			})
 		}
-		//
 	});
 });
 function handleUrlInput (e) {
