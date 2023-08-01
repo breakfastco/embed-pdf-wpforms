@@ -1,9 +1,3 @@
-// jQuery( document ).on( 'wpformsReady', ( event ) => {
-// 	console.log( 'hello field viewers' );
-// 	jQuery('.wpforms-field-pdf_viewer').each( ( field ) => {
-
-// 	});
-// });
 jQuery( document ).ready( function(e){
 	$builder = jQuery( '#wpforms-builder' );
 	$builder.on( 'wpformsBuilderReady', function ( evt ) {
@@ -83,9 +77,6 @@ function handleChooseClick (e) {
 		// Get one image from the uploader.
 		var attachment = file_frame.state().get('selection').first().toJSON();
 		var urlEl = document.getElementById( 'wpforms-field-option-' + e.target.dataset.fieldId + '-pdf_url' );
-		// if ( ! urlEl ) {
-		// 	urlEl = document.getElementById('url_pdf'); // Feed settings input.
-		// }
 		if ( urlEl && attachment.url ) {
 			urlEl.value = attachment.url;
 			// Fire the input event so our listener runs.
