@@ -1,26 +1,33 @@
 jQuery( document ).ready( function(e){
 	$builder = jQuery( '#wpforms-builder' );
-	$builder.on( 'wpformsBuilderReady', function ( evt ) {
-		// Add a click handler to the Choose PDF buttons.
-		var els = document.querySelectorAll( '.wpforms-field-option-row-pdf_url button' );
-		if ( els ) {
-			els.forEach( ( el ) => {
-				el.removeEventListener( 'click', handleChooseClick );
-				el.addEventListener( 'click', handleChooseClick );
-			});
+	$builder.on( 'wpformsFieldAdd', function( event, id, type ) {
+		if ( 'pdf_viewer' !== type ) {
+			return;
 		}
-		// Add input handlers to the URL fields.
-		els = document.querySelectorAll( '.wpforms-field-option-row-pdf_url input.pdf-url');
-		if ( els ) {
-			els.forEach( ( el ) => {
-				el.removeEventListener( 'input', handleUrlInput );
-				el.addEventListener( 'input', handleUrlInput );
-				// Fire the events so errors show as soon as the field is selected.
-				el.dispatchEvent(new Event('input'));
-			})
-		}
-	});
+		addPdfViewerFieldHandlers( event );
+	} );
+	$builder.on( 'wpformsBuilderReady', addPdfViewerFieldHandlers );
 });
+function addPdfViewerFieldHandlers( event ) {
+	// Add a click handler to the Choose PDF buttons.
+	var els = document.querySelectorAll( '.wpforms-field-option-row-pdf_url button' );
+	if ( els ) {
+		els.forEach( ( el ) => {
+			el.removeEventListener( 'click', handleChooseClick );
+			el.addEventListener( 'click', handleChooseClick );
+		});
+	}
+	// Add input handlers to the URL fields.
+	els = document.querySelectorAll( '.wpforms-field-option-row-pdf_url input.pdf-url');
+	if ( els ) {
+		els.forEach( ( el ) => {
+			el.removeEventListener( 'input', handleUrlInput );
+			el.addEventListener( 'input', handleUrlInput );
+			// Fire the events so errors show as soon as the field is selected.
+			el.dispatchEvent(new Event('input'));
+		})
+	}
+}
 function wpformsSetFieldError( element, message ) {
 	wpformsResetFieldError( element );
 	// Add error CSS class to input so its border is red.
