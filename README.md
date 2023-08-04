@@ -2,3 +2,5 @@
 
 # embed-pdf-wpforms
 WordPress plugin. Add-on for WPForms. Provides a PDF Viewer field.
+
+[Documentation at breakfastco.xyz →](https://breakfastco.xyz/embed-pdf-wpforms/)
