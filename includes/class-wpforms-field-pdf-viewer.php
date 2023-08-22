@@ -46,7 +46,6 @@ if ( class_exists( 'WPForms_Field' ) ) {
 			add_action( 'wpforms_frontend_css', array( $this, 'enqueue_css_frontend' ) );
 			add_action( 'wpforms_frontend_js', array( $this, 'load_js' ) );
 
-			add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_block_editor_assets' ) );
 			add_action( 'wpforms_builder_enqueues', array( $this, 'enqueue_assets_builder' ) );
 		}
 
@@ -427,70 +426,6 @@ if ( class_exists( 'WPForms_Field' ) ) {
 		}
 
 		/**
-		 * Format and sanitize field.
-		 *
-		 * @since 1.0.2
-		 * @since 1.6.1 Added a support for multiple values.
-		 *
-		 * @param int          $field_id     Field ID.
-		 * @param string|array $field_submit Submitted field value (selected option).
-		 * @param array        $form_data    Form data and settings.
-		 */
-		public function format( $field_id, $field_submit, $form_data ) {
-
-			$field    = $form_data['fields'][ $field_id ];
-			$dynamic  = false;
-			$multiple = ! empty( $field['multiple'] );
-			$name     = sanitize_text_field( $field['label'] );
-			$value    = array();
-
-			// Convert submitted field value to array.
-			if ( ! is_array( $field_submit ) ) {
-				$field_submit = array( $field_submit );
-			}
-
-			$value_raw = wpforms_sanitize_array_combine( $field_submit );
-
-			$data = array(
-				'name'      => $name,
-				'value'     => '',
-				'value_raw' => $value_raw,
-				'id'        => absint( $field_id ),
-				'type'      => $this->type,
-			);
-
-			// Normal processing, dynamic population is off.
-
-			// If show_values is true, that means values posted are the raw values
-			// and not the labels. So we need to get the label values.
-			if ( ! empty( $field['show_values'] ) && 1 === (int) $field['show_values'] ) {
-
-				foreach ( $field_submit as $item ) {
-					foreach ( $field['choices'] as $choice ) {
-						if ( $item === $choice['value'] ) {
-							$value[] = $choice['label'];
-
-							break;
-						}
-					}
-				}
-
-				$data['value'] = ! empty( $value ) ? wpforms_sanitize_array_combine( $value ) : '';
-
-			} else {
-				$data['value'] = $value_raw;
-			}
-
-			// Backward compatibility: for single dropdown save a string, for multiple - array.
-			if ( ! $multiple && is_array( $data ) && ( 1 === count( $data ) ) ) {
-				$data = reset( $data );
-			}
-
-			// Push field details to be saved.
-			wpforms()->process->fields[ $field_id ] = $data;
-		}
-
-		/**
 		 * Enqueue CSS and JS for the builder.
 		 *
 		 * @param string|null $view Current view.
@@ -527,25 +462,6 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				wp_enqueue_script( 'epdf_wf_pdfjs' );
 				wp_enqueue_script( 'epdf_wf_pdf_viewer' );
 			}
-		}
-
-		/**
-		 * Load WPForms Gutenberg block scripts.
-		 *
-		 * @since 1.8.1
-		 */
-		public function enqueue_block_editor_assets() {
-
-			$min = wpforms_get_min_suffix();
-
-			wp_enqueue_style(
-				'wpforms-choicesjs',
-				WPFORMS_PLUGIN_URL . "assets/css/choices{$min}.css",
-				array(),
-				self::CHOICES_VERSION
-			);
-
-			$this->enqueue_choicesjs_once( array() );
 		}
 
 		/**
