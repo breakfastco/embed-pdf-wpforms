@@ -62,8 +62,6 @@ function handleUrlInput (e) {
 	} else {
 		wpformsResetFieldError( e.target );
 	}
-
-
 }//const event = WPFormsUtils.triggerEvent( $builder, 'wpformsBuilderReady' );
 
 // Choose PDF button click handler in form editor & feed settings in pro
