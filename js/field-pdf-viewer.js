@@ -113,6 +113,9 @@ window.addEventListener( 'load', function(e) {
 	// The workerSrc property shall be specified.
 	if ( 'undefined' !== typeof pdfjsLib ) {
 		pdfjsLib.GlobalWorkerOptions.workerSrc = epdf_wf_pdfjs_strings.url_worker;
+		// Dispatch an event after pdfjs is ready.
+		const event = new CustomEvent( 'epdf_pdfjs_worker_set' );
+		window.dispatchEvent(event);
 	}
 });
 
@@ -235,11 +238,35 @@ function onZoomOut(e) {
 }
 function loadPreview( fieldId, formId ) {
 	var epdfInstance = window['epdf_' + fieldId];
-	var fieldElementId = 'field_' + formId + '_' + fieldId;
-	if ( '' === epdfInstance.urlPdf ) {
-		// There is no PDF to load.
+	if ( 'undefined' === typeof epdfInstance ) {
+		// Something is wrong, spin up data for this this preview is missing.
+		if ( epdf_wf_pdf_viewer_strings.script_debug ) {
+			console.log( '[Embed PDF for WPForms] loadPreview( ' + fieldId + ' ) failed, spin up data missing' );
+		}
 		return;
 	}
+
+	if ( '' === epdfInstance.urlPdf ) {
+		// There is no PDF to load.
+		if ( epdf_wf_pdf_viewer_strings.script_debug ) {
+			console.log( '[Embed PDF for WPForms] loadPreview( ' + fieldId + ' ) failed, no PDF URL' );
+		}
+		return;
+	}
+
+	const controls = {
+		'prev': 'onPrevPage',
+		'next': 'onNextPage',
+		'zoom_in': 'onZoomIn',
+		'zoom_out': 'onZoomOut'
+	};
+	Object.keys(controls).forEach(function(key, index){
+		var el = document.getElementById( epdfInstance.canvasId + '_' + key);
+		if ( el ) {
+			el.addEventListener('click', window[controls[key]]);
+		}
+	});
+
 	/**
 	 * Asynchronously downloads PDF.
 	 */
@@ -260,7 +287,10 @@ function loadPreview( fieldId, formId ) {
 		// Disable the Previous or Next buttons depending on page count.
 		togglePrevNextButtons(epdfInstance);
 	}).catch(function(error){
-		console.log(error);
+		if ( epdf_wf_pdf_viewer_strings.script_debug ) {
+			console.log( '[Embed PDF for WPForms]' );
+			console.log( error );
+		}
 		// Display an error on the front-end.
 
 		const el = document.querySelector('#wpforms-' + formId + '-field_' + fieldId + '.wpforms-container-pdf-viewer');

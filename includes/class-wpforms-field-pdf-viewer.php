@@ -91,7 +91,8 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				$handle,
 				'const epdf_wf_pdf_viewer_strings = ' . wp_json_encode(
 					array(
-						'site_url' => site_url(),
+						'site_url'     => site_url(),
+						'script_debug' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
 					)
 				),
 				'before'
@@ -394,26 +395,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				esc_html__( 'Zoom In', 'embed-pdf-wpforms' ),
 				esc_attr( $field_id ),
 				esc_attr( $url )
-			)
-				. "<script type=\"text/javascript\">
-			var epdf_{$field_id} = {
-					canvas: document.getElementById('{$canvas_id}'),
-					canvasId: '{$canvas_id}',
-					initialScale: {$initial_scale} ?? epdf_wf_pdfjs_strings.initialScale,
-					pageNum: 1,
-					pageNumPending: null,
-					pageRendering: false,
-					pdfDoc: null,
-					urlPdf: '{$url}',
-				};
-				window.addEventListener( 'load', function () {
-					document.getElementById('{$canvas_id}_prev').addEventListener('click', onPrevPage);
-					document.getElementById('{$canvas_id}_next').addEventListener('click', onNextPage);
-					document.getElementById('{$canvas_id}_zoom_in').addEventListener('click', onZoomIn);
-					document.getElementById('{$canvas_id}_zoom_out').addEventListener('click', onZoomOut);
-					loadPreview( {$field_id}, {$form_id} );
-				});
-			</script>";
+			);
 
 			$primary['class'][] = 'wpforms-container-pdf-viewer';
 
@@ -459,6 +441,39 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				wpforms_has_field_type( 'pdf_viewer', $forms, true ) ||
 				wpforms()->get( 'frontend' )->assets_global()
 			) {
+				// Add inline script to provide the spin-up data to each viewer.
+				$script = '';
+				foreach ( $forms as $form ) {
+					foreach ( $form['fields'] as $field ) {
+						if ( 'pdf_viewer' !== $field['type'] ) {
+							continue;
+						}
+
+						$field_id         = $field['id'];
+						$form_id          = $form['id'];
+						$initial_scale    = $field['initial_scale'];
+						$canvas_id        = $field_id . '_embed_pdf_wpforms';
+						$url              = $field['pdf_url'];
+
+						$script .= "window['epdf_{$field_id}'] = {
+							canvas: document.getElementById('{$canvas_id}'),
+							canvasId: '{$canvas_id}',
+							initialScale: {$initial_scale} ?? epdf_wf_pdfjs_strings.initialScale,
+							pageNum: 1,
+							pageNumPending: null,
+							pageRendering: false,
+							pdfDoc: null,
+							urlPdf: '{$url}',
+						}; window.addEventListener( 'epdf_pdfjs_worker_set', function () { loadPreview( {$field_id}, {$form_id} ); } );";
+					}
+				}
+				if ( '' !== $script ) {
+					wp_add_inline_script(
+						'epdf_wf_pdf_viewer',
+						$script,
+						'before'
+					);
+				}
 				wp_enqueue_script( 'epdf_wf_pdfjs' );
 				wp_enqueue_script( 'epdf_wf_pdf_viewer' );
 			}
