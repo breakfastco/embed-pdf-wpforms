@@ -342,22 +342,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 			$form_id       = $form_data['id'];
 			$canvas_id     = $field_id . '_embed_pdf_wpforms';
 			$initial_scale = empty( $field['initial_scale'] ) ? DEFAULT_SCALE_VALUE : $field['initial_scale'];
-
-			// What is the PDF URL?
-			// The user might have chosen a PDF and saved it with the form.
-			$url = $field['pdf_url'];
-			if ( ! filter_var( $url, FILTER_VALIDATE_URL ) ) {
-				$url = '';
-			}
-
-			// Do we have a PDF URL via Dynamic Population?
-			if ( ! empty( $field['properties']['inputs']['primary']['attr']['value'] ) ) {
-				// Is the populated value a URL?
-				if ( filter_var( $field['properties']['inputs']['primary']['attr']['value'], FILTER_VALIDATE_URL ) ) {
-					// Yes.
-					$url = esc_url( $field['properties']['inputs']['primary']['attr']['value'] );
-				}
-			}
+			$url           = $this->get_url( $field, $form_id );
 
 			// Do we even have a PDF?
 			if ( empty( $url ) ) {
@@ -408,6 +393,32 @@ if ( class_exists( 'WPForms_Field' ) ) {
 		}
 
 		/**
+		 * What is the PDF URL? The user might have chosen a PDF and saved it
+		 * with the form. It may be populated via Dynamic Population.
+		 *
+		 * @param  mixed $field   Field data and settings.
+		 * @param  mixed $form_id Form data and settings.
+		 * @return string
+		 */
+		protected function get_url( $field, $form_id ) {
+			$url = $field['pdf_url'];
+			if ( ! filter_var( $url, FILTER_VALIDATE_URL ) ) {
+				$url = '';
+			}
+
+			// Do we have a PDF URL via Dynamic Population?
+			if ( ! empty( $field['properties']['inputs']['primary']['attr']['value'] ) ) {
+				// Is the populated value a URL?
+				if ( filter_var( $field['properties']['inputs']['primary']['attr']['value'], FILTER_VALIDATE_URL ) ) {
+					// Yes.
+					$url = esc_url( $field['properties']['inputs']['primary']['attr']['value'] );
+				}
+			}
+
+			return $url;
+		}
+
+		/**
 		 * Enqueue CSS and JS for the builder.
 		 *
 		 * @param string|null $view Current view.
@@ -449,11 +460,11 @@ if ( class_exists( 'WPForms_Field' ) ) {
 							continue;
 						}
 
-						$field_id         = $field['id'];
-						$form_id          = $form['id'];
-						$initial_scale    = $field['initial_scale'];
-						$canvas_id        = $field_id . '_embed_pdf_wpforms';
-						$url              = $field['pdf_url'];
+						$field_id      = $field['id'];
+						$form_id       = $form['id'];
+						$initial_scale = empty( $field['initial_scale'] ) ? DEFAULT_SCALE_VALUE : $field['initial_scale'];
+						$canvas_id     = $field_id . '_embed_pdf_wpforms';
+						$url           = $this->get_url( $field, $form_id );
 
 						$script .= "window['epdf_{$field_id}'] = {
 							canvas: document.getElementById('{$canvas_id}'),
