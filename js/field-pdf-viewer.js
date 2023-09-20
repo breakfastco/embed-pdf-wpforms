@@ -64,7 +64,7 @@ function handleUrlInput (e) {
 	}
 }//const event = WPFormsUtils.triggerEvent( $builder, 'wpformsBuilderReady' );
 
-// Choose PDF button click handler in form editor & feed settings in pro
+// Choose PDF button click handler in form editor
 function handleChooseClick (e) {
 	e.preventDefault();
 	const { __ } = wp.i18n;
