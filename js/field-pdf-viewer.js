@@ -1,122 +1,21 @@
-jQuery( document ).ready( function(e){
-	$builder = jQuery( '#wpforms-builder' );
-	$builder.on( 'wpformsFieldAdd', function( event, id, type ) {
-		if ( 'pdf_viewer' !== type ) {
-			return;
-		}
-		addPdfViewerFieldHandlers( event );
-	} );
-	$builder.on( 'wpformsBuilderReady', addPdfViewerFieldHandlers );
-});
-function addPdfViewerFieldHandlers( event ) {
-	// Add a click handler to the Choose PDF buttons.
-	var els = document.querySelectorAll( '.wpforms-field-option-row-pdf_url button' );
-	if ( els ) {
-		els.forEach( ( el ) => {
-			el.removeEventListener( 'click', handleChooseClick );
-			el.addEventListener( 'click', handleChooseClick );
-		});
-	}
-	// Add input handlers to the URL fields.
-	els = document.querySelectorAll( '.wpforms-field-option-row-pdf_url input.pdf-url');
-	if ( els ) {
-		els.forEach( ( el ) => {
-			el.removeEventListener( 'input', handleUrlInput );
-			el.addEventListener( 'input', handleUrlInput );
-			// Fire the events so errors show as soon as the field is selected.
-			el.dispatchEvent(new Event('input'));
-		})
-	}
-}
-function wpformsSetFieldError( element, message ) {
-	wpformsResetFieldError( element );
-	// Add error CSS class to input so its border is red.
-	element.classList.add( 'wpforms-error');
-	// Add a message below the field telling the user about the problem.
-	const error = document.createElement("p");
-	error.classList.add( 'wpforms-alert-danger' );
-	error.classList.add( 'wpforms-alert' );
-	error.classList.add( 'wpforms-error-msg' );
-	error.innerHTML = message;
-	element.parentNode.insertBefore( error, element.nextSibling );
-}
-function wpformsResetFieldError( element ) {
-	// Remove all errors for this field and the class making the fields border red.
-	element.classList.remove( 'wpforms-error');
-	document.querySelectorAll( '#' + element.parentNode.id + ' .wpforms-alert' ).forEach( ( el ) => el.remove() );
-}
-function handleUrlInput (e) {
-	e.preventDefault();
-	// Is it a valid URL?
-	if ( ! isValidHttpUrl( e.target.value ) ) {
-		// No.
-		const { __ } = wp.i18n;
-		wpformsSetFieldError( e.target, __( 'Please enter a valid URL.', 'embed-pdf-wpforms' ) );
-
-	// Is it a local URL?
-	} else if ( epdf_wf_pdf_viewer_strings.site_url !== e.target.value.substring( 0, epdf_wf_pdf_viewer_strings.site_url.length ) ) {
-		const { __ } = wp.i18n;
-		const msg = __( 'Only PDFs hosted by this website and other websites listing this website in a CORS header ‘Access-Control-Allow-Origin’ can load in the viewer.', 'embed-pdf-wpforms' )
-			+ ' <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">' + __( 'Learn about CORS →', 'embed-pdf-wpforms' ) + '</a>';
-		wpformsSetFieldError( e.target, msg );
-	} else {
-		wpformsResetFieldError( e.target );
-	}
-}//const event = WPFormsUtils.triggerEvent( $builder, 'wpformsBuilderReady' );
-
-// Choose PDF button click handler in form editor
-function handleChooseClick (e) {
-	e.preventDefault();
-	const { __ } = wp.i18n;
-	var file_frame = wp.media.frames.file_frame = wp.media({
-		title: __( 'Choose PDF', 'embed-pdf-wpforms' ),
-		button: {
-			text: __( 'Load', 'embed-pdf-wpforms' )
-		},
-		frame: 'select',
-		multiple: false
-	});
-
-	// When an image is selected, run a callback.
-	file_frame.on('select', function () {
-		// Get one image from the uploader.
-		var attachment = file_frame.state().get('selection').first().toJSON();
-		var urlEl = document.getElementById( 'wpforms-field-option-' + e.target.dataset.fieldId + '-pdf_url' );
-		if ( urlEl && attachment.url ) {
-			urlEl.value = attachment.url;
-			// Fire the input event so our listener runs.
-			urlEl.dispatchEvent(new Event('input'));
-		}
-	});
-
-	// Finally, open the modal
-	file_frame.open();
-
-	// Don't submit forms.
-	return false;
-}
-
-function isValidHttpUrl(string) {
-	let url;
-
-	try {
-		url = new URL(string);
-	} catch (_) {
-		return false;
-	}
-
-	return url.protocol === "http:" || url.protocol === "https:";
-}
-
 // Loading, paging, & zooming pdf.js viewers
 window.addEventListener( 'load', function(e) {
 	// The workerSrc property shall be specified.
 	if ( 'undefined' !== typeof pdfjsLib ) {
 		pdfjsLib.GlobalWorkerOptions.workerSrc = epdf_wf_pdfjs_strings.url_worker;
 		// Dispatch an event after pdfjs is ready.
-		const event = new CustomEvent( 'epdf_pdfjs_worker_set' );
+		const event = new CustomEvent( 'epdf_wf_pdfjs_worker_set' );
 		window.dispatchEvent(event);
 	}
+});
+
+// Spin up script. Initializes all the viewers.
+window.addEventListener( 'epdf_wf_pdfjs_worker_set', function(e) {
+	window['epdf_wf'] = {};
+	document.querySelectorAll( '.epdf-container canvas.epdf' ).forEach( function( el ) {
+		window['epdf_wf'][el.dataset.field] = {};
+		loadPreview( el.dataset.field, el.dataset.form );
+	});
 });
 
 /**
@@ -124,63 +23,67 @@ window.addEventListener( 'load', function(e) {
  * @param num Page number.
  */
 function renderPage( epdfInstance, pageNum ) {
-	epdfInstance.pageRendering = true;
-	// Using promise to fetch the page
-	epdfInstance.pdfDoc.getPage(pageNum).then(function(page) {
+	if ( isNaN( Number(pageNum) ) ) {
+		pageNum = 1;
+	}
 
-		var viewport = page.getViewport({scale: epdfInstance.pdfDoc.currentScaleValue});
-		epdfInstance.canvas.height = viewport.height;
-		epdfInstance.canvas.width = viewport.width;
+	epdfInstance.dataset.pageRendering = true;
+	// Using promise to fetch the page
+	window['epdf_wf'][epdfInstance.dataset.field]['pdfDoc'].getPage(pageNum).then(function(page) {
+
+		var viewport = page.getViewport({scale: window['epdf_wf'][epdfInstance.dataset.field]['pdfDoc'].currentScaleValue});
+		epdfInstance.height = viewport.height;
+		epdfInstance.width = viewport.width;
 
 		// Render PDF page into canvas context
 		var renderContext = {
-			canvasContext: epdfInstance.canvas.getContext('2d'),
+			canvasContext: epdfInstance.getContext('2d'),
 			viewport: viewport
 		};
 		var renderTask = page.render(renderContext);
 
 		// Wait for rendering to finish
 		renderTask.promise.then(function() {
-			epdfInstance.pageRendering = false;
-			if (epdfInstance.pageNumPending !== null) {
+			epdfInstance.dataset.pageRendering = false;
+			if (epdfInstance.dataset.pageNumPending !== '') {
 				// New page rendering is pending
-				renderPage(epdfInstance, epdfInstance.pageNumPending);
-				epdfInstance.pageNumPending = null;
+				renderPage(epdfInstance, Number(epdfInstance.dataset.pageNumPending));
+				epdfInstance.dataset.pageNumPending = '';
 			}
 
 			// Set the canvas width once or else zoom in and out break
-			epdfInstance.canvas.style.width = '100%';
-			epdfInstance.canvas.style.width = epdfInstance.canvas.width + 'px';
+			epdfInstance.style.width = '100%';
+			epdfInstance.style.width = epdfInstance.width + 'px';
 
 			// Dispatch an event after a page render.
-			const event = new CustomEvent( 'epdf_render_page', { detail: epdfInstance.pageNum });
+			const event = new CustomEvent( 'epdf_wf_render_page', { detail: epdfInstance.dataset.pageNum });
 			window.dispatchEvent(event);
 		});
 	});
 
 	// Update page counters
-	document.getElementById( epdfInstance.canvasId + '_page_num').textContent = pageNum;
+	document.getElementById( epdfInstance.id + '_page_num').textContent = pageNum;
 }
 /**
  * If another page rendering in progress, waits until the rendering is
  * finised. Otherwise, executes rendering immediately.
  */
 function queueRenderPage(epdfInstance) {
-	if (epdfInstance.pageRendering) {
-		epdfInstance.pageNumPending = epdfInstance.pageNum;
+	if ('true' === epdfInstance.dataset.pageRendering) {
+		epdfInstance.dataset.pageNumPending = epdfInstance.dataset.pageNum;
 	} else {
-		renderPage(epdfInstance,epdfInstance.pageNum);
+		renderPage(epdfInstance, Number(epdfInstance.dataset.pageNum));
 	}
 }
 /**
  * Displays previous page.
  */
 function onPrevPage(e) {
-	var epdfInstance = window['epdf_' + e.target.dataset.viewerId];
-	if (epdfInstance.pageNum <= 1) {
+	var epdfInstance = canvasElement( e.target.dataset.field, e.target.dataset.form );
+	if (Number(epdfInstance.dataset.pageNum) <= 1) {
 		return;
 	}
-	epdfInstance.pageNum--;
+	epdfInstance.dataset.pageNum--;
 	queueRenderPage(epdfInstance);
 	togglePrevNextButtons(epdfInstance);
 }
@@ -188,17 +91,17 @@ function onPrevPage(e) {
  * Displays next page.
  */
 function onNextPage(e) {
-	var epdfInstance = window['epdf_' + e.target.dataset.viewerId];
-	if (epdfInstance.pageNum >= epdfInstance.pdfDoc.numPages) {
+	var epdfInstance = canvasElement( e.target.dataset.field, e.target.dataset.form );
+	if (Number(epdfInstance.dataset.pageNum) >= window['epdf_wf'][e.target.dataset.field]['pdfDoc'].numPages) {
 		return;
 	}
-	epdfInstance.pageNum++;
+	epdfInstance.dataset.pageNum++;
 	queueRenderPage(epdfInstance);
 	togglePrevNextButtons(epdfInstance);
 }
 function togglePrevNextButtons( epdfInstance ) {
-	document.getElementById( epdfInstance.canvasId + '_prev').disabled = ( 1 == epdfInstance.pageNum );
-	document.getElementById( epdfInstance.canvasId + '_next').disabled = ( epdfInstance.pageNum == epdfInstance.pdfDoc.numPages );
+	document.getElementById( epdfInstance.id + '_prev').disabled = ( 1 == epdfInstance.dataset.pageNum );
+	document.getElementById( epdfInstance.id + '_next').disabled = ( epdfInstance.dataset.pageNum == window['epdf_wf'][epdfInstance.dataset.field]['pdfDoc'].numPages );
 }
 function scaleDeltaDefault() {
 	return 1.1;
@@ -211,33 +114,38 @@ function scaleMax() {
 }
 
 function onZoomIn(e) {
-	var epdfInstance = window['epdf_' + e.target.dataset.viewerId];
-	let newScale = epdfInstance.pdfDoc.currentScaleValue;
+	var epdfInstance = canvasElement( e.target.dataset.field, e.target.dataset.form );
+	let newScale = window['epdf_wf'][e.target.dataset.field]['pdfDoc'].currentScaleValue;
 	newScale = (newScale * scaleDeltaDefault()).toFixed(2);
 	newScale = Math.ceil(newScale * 10) / 10;
 	newScale = Math.min(scaleMax(), newScale);
-	epdfInstance.pdfDoc.currentScaleValue = newScale;
-	renderPage(epdfInstance, epdfInstance.pageNum);
+	window['epdf_wf'][e.target.dataset.field]['pdfDoc'].currentScaleValue = newScale;
+	renderPage(epdfInstance, Number(epdfInstance.dataset.pageNum));
 
 	// Dispatch an event about the new scale value.
-	const event = new CustomEvent( 'epdf_scale_value', { detail: newScale });
+	const event = new CustomEvent( 'epdf_wf_scale_value', { detail: newScale });
 	window.dispatchEvent(event);
 }
 function onZoomOut(e) {
-	var epdfInstance = window['epdf_' + e.target.dataset.viewerId];
-	let newScale = epdfInstance.pdfDoc.currentScaleValue;
+	var epdfInstance = canvasElement( e.target.dataset.field, e.target.dataset.form );
+	let newScale = window['epdf_wf'][e.target.dataset.field]['pdfDoc'].currentScaleValue;
 	newScale = (newScale / scaleDeltaDefault()).toFixed(2);
 	newScale = Math.floor(newScale * 10) / 10;
 	newScale = Math.max(scaleMin(), newScale);
-	epdfInstance.pdfDoc.currentScaleValue = newScale;
-	renderPage(epdfInstance, epdfInstance.pageNum);
+	window['epdf_wf'][e.target.dataset.field]['pdfDoc'].currentScaleValue = newScale;
+	renderPage(epdfInstance, Number(epdfInstance.dataset.pageNum));
 
 	// Dispatch an event about the new scale value.
 	const event = new CustomEvent( 'epdf_scale_value', { detail: newScale });
 	window.dispatchEvent(event);
 }
+
+function canvasElement( fieldId, formId ) {
+	return document.querySelector( '.epdf-container canvas.epdf#wpforms-' + formId + '-canvas_' + fieldId );
+}
+
 function loadPreview( fieldId, formId ) {
-	var epdfInstance = window['epdf_' + fieldId];
+	var epdfInstance = canvasElement( fieldId, formId );
 	if ( 'undefined' === typeof epdfInstance ) {
 		// Something is wrong, spin up data for this this preview is missing.
 		if ( epdf_wf_pdf_viewer_strings.script_debug ) {
@@ -246,7 +154,8 @@ function loadPreview( fieldId, formId ) {
 		return;
 	}
 
-	if ( '' === epdfInstance.urlPdf ) {
+	var urlEl = document.getElementById( 'wpforms-' + formId + '-field_' + fieldId );
+	if ( null === urlEl || '' === urlEl.value ) {
 		// There is no PDF to load.
 		if ( epdf_wf_pdf_viewer_strings.script_debug ) {
 			console.log( '[Embed PDF for WPForms] loadPreview( ' + fieldId + ' ) failed, no PDF URL' );
@@ -261,7 +170,7 @@ function loadPreview( fieldId, formId ) {
 		'zoom_out': 'onZoomOut'
 	};
 	Object.keys(controls).forEach(function(key, index){
-		var el = document.getElementById( epdfInstance.canvasId + '_' + key);
+		var el = document.getElementById( epdfInstance.id + '_' + key);
 		if ( el ) {
 			el.addEventListener('click', window[controls[key]]);
 		}
@@ -270,19 +179,19 @@ function loadPreview( fieldId, formId ) {
 	/**
 	 * Asynchronously downloads PDF.
 	 */
-	pdfjsLib.getDocument({ url: epdfInstance.urlPdf, verbosity: 0 }).promise.then(function(pdfDoc_) {
-		if (epdfInstance.pdfDoc) {
-			epdfInstance.pdfDoc.destroy();
+	pdfjsLib.getDocument({ url: urlEl.value, verbosity: 0 }).promise.then(function(pdfDoc_) {
+		if (window['epdf_wf'][fieldId]['pdfDoc']) {
+			window['epdf_wf'][fieldId]['pdfDoc'].destroy();
 		}
-		epdfInstance.pdfDoc = pdfDoc_;
-		document.getElementById( epdfInstance.canvasId + '_page_count').textContent = epdfInstance.pdfDoc.numPages;
-		epdfInstance.pdfDoc.currentScaleValue = epdfInstance.initialScale;
+		window['epdf_wf'][fieldId]['pdfDoc'] = pdfDoc_;
+		document.getElementById( epdfInstance.id + '_page_count').textContent = window['epdf_wf'][fieldId]['pdfDoc'].numPages;
+		window['epdf_wf'][fieldId]['pdfDoc'].currentScaleValue = epdfInstance.dataset.initialScale;
 
 		// Blow up the canvas to 100% width before rendering
-		epdfInstance.canvas.style.width = '100%';
+		epdfInstance.style.width = '100%';
 
 		// Initial/first page rendering
-		renderPage(epdfInstance, epdfInstance.pageNum);
+		renderPage(epdfInstance, Number(epdfInstance.dataset.pageNum));
 
 		// Disable the Previous or Next buttons depending on page count.
 		togglePrevNextButtons(epdfInstance);

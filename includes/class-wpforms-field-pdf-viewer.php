@@ -77,13 +77,13 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				'before'
 			);
 
-			// Our viewer JavaScript, including front-end and Builder controls.
+			// Script for the front-end.
 			$handle = 'epdf_wf_pdf_viewer';
 			$min    = wpforms_get_min_suffix();
 			wp_register_script(
 				$handle,
 				plugins_url( "js/field-pdf-viewer{$min}.js", EMBED_PDF_WPFORMS_PATH ),
-				array( 'wp-i18n', 'epdf_wf_pdfjs', 'jquery' ),
+				array( 'wp-i18n', 'epdf_wf_pdfjs' ),
 				EMBED_PDF_WPFORMS_VERSION,
 				true
 			);
@@ -337,10 +337,9 @@ if ( class_exists( 'WPForms_Field' ) ) {
 		public function field_display( $field, $deprecated, $form_data ) {
 
 			// Define data.
-			$primary       = $field['properties']['inputs']['primary'];
 			$field_id      = $field['id'];
 			$form_id       = $form_data['id'];
-			$canvas_id     = $field_id . '_embed_pdf_wpforms';
+			$canvas_id     = sprintf( 'wpforms-%s-canvas_%s', $form_id, $field_id );
 			$initial_scale = empty( $field['initial_scale'] ) ? DEFAULT_SCALE_VALUE : $field['initial_scale'];
 			$url           = $this->get_url( $field, $form_id );
 
@@ -362,33 +361,32 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				return;
 			}
 
-			$canvas_controls = sprintf(
+			// Primary input is a hidden field that saves the URL.
+			$primary                  = $field['properties']['inputs']['primary'];
+			$primary['atts']['type']  = 'hidden';
+			$primary['atts']['name']  = sprintf( 'wpforms[fields][%s]', $field_id );
+			$primary['atts']['value'] = $url;
+
+			printf(
 				'<div class="epdf-controls-container">'
 					// Paging controls.
-					. '<span class="page"><button class="wpforms-page-button button" onclick="return false" id="%1$s_prev" data-viewer-id="%7$s" title="%2$s">%2$s</button> <button class="wpforms-page-button button" onclick="return false" id="%1$s_next" data-viewer-id="%7$s" title="%3$s">%3$s</button></span> '
+					. '<span class="page"><button class="wpforms-page-button button" onclick="return false" id="%1$s_prev" data-field="%7$s" data-form="%9$s" title="%2$s">%2$s</button> <button class="wpforms-page-button button" onclick="return false" id="%1$s_next" data-field="%7$s" data-form="%9$s" title="%3$s">%3$s</button></span> '
 					. '<span class="paging">%4$s <span id="%1$s_page_num"></span> / <span id="%1$s_page_count"></span></span> '
 					// Zoom controls.
-					. '<span class="zoom"><button class="wpforms-page-button button" onclick="return false" id="%1$s_zoom_out" data-viewer-id="%7$s" title="%5$s">%5$s</button> <button class="wpforms-page-button button" onclick="return false" id="%1$s_zoom_in" data-viewer-id="%7$s" title="%6$s">%6$s</button></span>'
+					. '<span class="zoom"><button class="wpforms-page-button button" onclick="return false" id="%1$s_zoom_out" data-field="%7$s" data-form="%9$s" title="%5$s">%5$s</button> <button class="wpforms-page-button button" onclick="return false" id="%1$s_zoom_in" data-field="%7$s" data-form="%9$s" title="%6$s">%6$s</button></span>'
 					. '</div>'
-					. '<div class="epdf-container"><canvas id="%1$s" class="epdf"></canvas></div>'
-					. '<input type="hidden" name="wpforms[fields][%7$s]" value="%8$s" />',
-				esc_attr( $canvas_id ),
-				esc_html__( 'Previous', 'embed-pdf-wpforms' ),
-				esc_html__( 'Next', 'embed-pdf-wpforms' ),
-				esc_html__( 'Page:', 'embed-pdf-wpforms' ),
-				esc_html__( 'Zoom Out', 'embed-pdf-wpforms' ),
-				esc_html__( 'Zoom In', 'embed-pdf-wpforms' ),
-				esc_attr( $field_id ),
-				esc_attr( $url )
-			);
-
-			$primary['class'][] = 'wpforms-container-pdf-viewer';
-
-			// Primary field.
-			printf(
-				'<div %s>%s</div>',
-				wpforms_html_attributes( $primary['id'], $primary['class'], $primary['data'] ),
-				$canvas_controls
+					. '<div class="epdf-container"><canvas id="%1$s" class="epdf" data-initial-scale="%8$s" data-page-num="1" data-page-pending="" data-rendering="false" data-field="%7$s" data-form="%9$s"></canvas></div>'
+					. '<input %10$s />',
+				/* 1 */ esc_attr( $canvas_id ),
+				/* 2 */ esc_html__( 'Previous', 'embed-pdf-wpforms' ),
+				/* 3 */ esc_html__( 'Next', 'embed-pdf-wpforms' ),
+				/* 4 */ esc_html__( 'Page:', 'embed-pdf-wpforms' ),
+				/* 5 */ esc_html__( 'Zoom Out', 'embed-pdf-wpforms' ),
+				/* 6 */ esc_html__( 'Zoom In', 'embed-pdf-wpforms' ),
+				/* 7 */ esc_attr( $field_id ),
+				/* 8 */ esc_attr( $initial_scale ),
+				/* 9 */ esc_attr( $form_id ),
+				/*10 */ wpforms_html_attributes( $primary['id'], array(), array(), $primary['atts'] ),
 			);
 		}
 
@@ -452,39 +450,6 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				wpforms_has_field_type( 'pdf_viewer', $forms, true ) ||
 				wpforms()->get( 'frontend' )->assets_global()
 			) {
-				// Add inline script to provide the spin-up data to each viewer.
-				$script = '';
-				foreach ( $forms as $form ) {
-					foreach ( $form['fields'] as $field ) {
-						if ( 'pdf_viewer' !== $field['type'] ) {
-							continue;
-						}
-
-						$field_id      = $field['id'];
-						$form_id       = $form['id'];
-						$initial_scale = empty( $field['initial_scale'] ) ? DEFAULT_SCALE_VALUE : $field['initial_scale'];
-						$canvas_id     = $field_id . '_embed_pdf_wpforms';
-						$url           = $this->get_url( $field, $form_id );
-
-						$script .= "window['epdf_{$field_id}'] = {
-							canvas: document.getElementById('{$canvas_id}'),
-							canvasId: '{$canvas_id}',
-							initialScale: {$initial_scale} ?? epdf_wf_pdfjs_strings.initialScale,
-							pageNum: 1,
-							pageNumPending: null,
-							pageRendering: false,
-							pdfDoc: null,
-							urlPdf: '{$url}',
-						}; window.addEventListener( 'epdf_pdfjs_worker_set', function () { loadPreview( {$field_id}, {$form_id} ); } );";
-					}
-				}
-				if ( '' !== $script ) {
-					wp_add_inline_script(
-						'epdf_wf_pdf_viewer',
-						$script,
-						'before'
-					);
-				}
 				wp_enqueue_script( 'epdf_wf_pdfjs' );
 				wp_enqueue_script( 'epdf_wf_pdf_viewer' );
 			}
