@@ -8,6 +8,9 @@ jQuery( document ).ready( function(e){
 	} );
 	$builder.on( 'wpformsBuilderReady', addPdfViewerFieldHandlers );
 });
+function abortPreviousFetch( e ) {
+	controller.abort();
+}
 function addPdfViewerFieldHandlers( event ) {
 	// Add a click handler to the Choose PDF buttons.
 	var els = document.querySelectorAll( '.wpforms-field-option-row-pdf_url button' );
@@ -21,6 +24,8 @@ function addPdfViewerFieldHandlers( event ) {
 	els = document.querySelectorAll( '.wpforms-field-option-row-pdf_url input.pdf-url');
 	if ( els ) {
 		els.forEach( ( el ) => {
+			el.removeEventListener( 'input', abortPreviousFetch );
+			el.addEventListener( 'input', abortPreviousFetch );
 			el.removeEventListener( 'input', handleUrlInput );
 			el.addEventListener( 'input', handleUrlInput );
 			// Fire the events so errors show as soon as the field is selected.
@@ -45,23 +50,25 @@ function wpformsResetFieldError( element ) {
 	element.classList.remove( 'wpforms-error');
 	document.querySelectorAll( '#' + element.parentNode.id + ' .wpforms-alert' ).forEach( ( el ) => el.remove() );
 }
+
 function handleUrlInput (e) {
 	e.preventDefault();
+	const { __ } = wp.i18n;
+
 	// Is it a valid URL?
 	if ( ! isValidHttpUrl( e.target.value ) ) {
 		// No.
-		const { __ } = wp.i18n;
 		wpformsSetFieldError( e.target, __( 'Please enter a valid URL.', 'embed-pdf-wpforms' ) );
 
 	// Is it a local URL?
 	} else if ( epdf_wf_pdf_viewer_strings.site_url !== e.target.value.substring( 0, epdf_wf_pdf_viewer_strings.site_url.length ) ) {
-		const { __ } = wp.i18n;
 		const msg = __( 'Only PDFs hosted by this website and other websites listing this website in a CORS header ‘Access-Control-Allow-Origin’ can load in the viewer.', 'embed-pdf-wpforms' )
 			+ ' <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">' + __( 'Learn about CORS →', 'embed-pdf-wpforms' ) + '</a>';
 		wpformsSetFieldError( e.target, msg );
-	} else {
-		wpformsResetFieldError( e.target );
 	}
+
+	// Does the file exist?
+	localFileExists( e.target.value ).then( exists => exists ? wpformsResetFieldError( e.target ) : wpformsSetFieldError( e.target, __( 'No file exists at the provided URL.', 'embed-pdf-wpforms' ) ) );
 }
 
 // Choose PDF button click handler in form editor
@@ -106,4 +113,25 @@ function isValidHttpUrl(string) {
 	}
 
 	return url.protocol === "http:" || url.protocol === "https:";
+}
+
+var controller = new AbortController();
+const localFileExists = file => {
+	if ( epdf_wf_pdf_viewer_strings.site_url !== file.substring( 0, epdf_wf_pdf_viewer_strings.site_url.length ) ) {
+		return Promise.resolve(false);
+	}
+	controller = new AbortController();
+	const response = fetch(
+		file,
+		{
+			method: 'HEAD',
+			cache:'no-store',
+			credentials: 'omit',
+			signal: controller.signal,
+		}
+	).then(response => (
+		200 === response.status && response.url === file
+	))
+	.catch( exception => false );
+	return response;
 }
