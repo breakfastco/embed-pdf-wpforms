@@ -6,13 +6,13 @@ canvas.epdf{
 }
 
 /* Input wrapper gets a light grey border and background to contrast controls and document */
-div.wpforms-container-full .wpforms-container-pdf-viewer{
+div.wpforms-container-full .wpforms-field.wpforms-field-pdf_viewer{
 	border: 1px solid #eaeaea;
 	background-color: #f9f9f9;
 	padding: 1em;
 }
 /* Border around the actual PDF */
-.wpforms-container-pdf-viewer canvas.epdf{
+.wpforms-field.wpforms-field-pdf_viewer canvas.epdf{
 	border: 1px solid #e6e6e6;
 }
 
