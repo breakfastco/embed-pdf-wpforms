@@ -24,7 +24,7 @@ Embed PDF for WPForms provides a PDF Viewer field type. Include PDF files in for
 * Supports Dynamic Population
 * Initial Scale setting changes default zoom level
 
-= Web page =
+= Demo =
 
 [https://breakfastco.xyz/embed-pdf-for-wpforms/](https://breakfastco.xyz/embed-pdf-for-wpforms/)
 
