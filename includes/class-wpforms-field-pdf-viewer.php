@@ -98,6 +98,15 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				'before'
 			);
 
+			// Script for the Builder.
+			wp_register_script(
+				'epdf_wf_form_editor',
+				plugins_url( "js/form-editor{$min}.js", EMBED_PDF_WPFORMS_PATH ),
+				array( 'wp-i18n', 'epdf_wf_pdfjs', 'jquery' ),
+				EMBED_PDF_WPFORMS_VERSION,
+				true
+			);
+
 			// CSS for the Builder.
 			wp_register_style(
 				'wpforms-builder-embed-pdf',
@@ -424,6 +433,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 		public function enqueue_assets_builder( $view = null ) {
 			wp_enqueue_style( 'wpforms-builder-embed-pdf' );
 			wp_enqueue_script( 'epdf_wf_pdf_viewer' );
+			wp_enqueue_script( 'epdf_wf_form_editor' );
 		}
 
 		/**
