@@ -47,6 +47,66 @@ if ( class_exists( 'WPForms_Field' ) ) {
 			add_action( 'wpforms_frontend_js', array( $this, 'load_js' ) );
 
 			add_action( 'wpforms_builder_enqueues', array( $this, 'enqueue_assets_builder' ) );
+
+			// AJAX handler for the Download PDF into Media Library button.
+			add_action( 'wp_ajax_epdf_wf_download_pdf_media', array( $this, 'ajax_handler_download_pdf_media' ) );
+		}
+
+		/**
+		 * AJAX handler for the Download PDF into Media Library button.
+		 *
+		 * @return void
+		 */
+		public function ajax_handler_download_pdf_media() {
+			check_ajax_referer( 'epdf_wf_download_pdf_media' );
+
+			if ( empty( $_POST['url'] ) ) {
+				wp_send_json_error();
+			}
+
+			$url = sanitize_url( wp_unslash( $_POST['url'] ) );
+
+			// Download the file.
+			$tmp_file = download_url( $url );
+			if ( is_wp_error( $tmp_file ) ) {
+				wp_send_json_error(
+					array(
+						/* translators: 1. An error message. */
+						'msg' => sprintf( __( 'The download failed with error "%s"', 'embed-pdf-wpforms' ), $tmp_file->get_error_message() ),
+					)
+				);
+			}
+			// Move from a temp file to the uploads directory.
+			$upload_dir = wp_upload_dir();
+			$file_name  = wp_unique_filename( $upload_dir['path'], basename( $url ) );
+			$path       = $upload_dir['path'] . DIRECTORY_SEPARATOR . $file_name;
+			global $wp_filesystem;
+			if ( ! class_exists( 'WP_Filesystem' ) ) {
+				require_once ABSPATH . '/wp-admin/includes/file.php';
+			}
+			WP_Filesystem();
+			$wp_filesystem->move( $tmp_file, $path );
+			// Add to the database.
+			$media_id = wp_insert_attachment(
+				array(
+					'post_author'    => wp_get_current_user()->ID,
+					'post_title'     => $file_name,
+					'post_status'    => 'publish',
+					'comment_status' => 'closed',
+					'ping_status'    => 'closed',
+					'meta_input'     => array(
+						/* translators: 1. An external URL. */
+						'_source' => sprintf( __( 'Downloaded from %s by Embed PDF for WPForms', 'embed-pdf-wpforms' ), $url ),
+					),
+				),
+				$path
+			);
+			wp_update_attachment_metadata( $media_id, wp_generate_attachment_metadata( $media_id, $path ) );
+			wp_send_json_success(
+				array(
+					'url' => wp_get_attachment_url( $media_id ),
+				)
+			);
 		}
 
 		/**
@@ -91,8 +151,11 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				$handle,
 				'const epdf_wf_pdf_viewer_strings = ' . wp_json_encode(
 					array(
-						'site_url'     => site_url(),
-						'script_debug' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
+						'site_url'         => site_url(),
+						'script_debug'     => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
+						'can_upload_files' => current_user_can( 'upload_files' ),
+						'ajax_url'         => admin_url( 'admin-ajax.php' ),
+						'nonce'            => wp_create_nonce( 'epdf_wf_download_pdf_media' ),
 					)
 				),
 				'before'

@@ -67,12 +67,27 @@
 		if ( ! isValidHttpUrl( e.target.value ) ) {
 			// No.
 			wpformsSetFieldError( e.target, __( 'Please enter a valid URL.', 'embed-pdf-wpforms' ) );
+			return;
 
 		// Is it a local URL?
 		} else if ( epdf_wf_pdf_viewer_strings.site_url !== e.target.value.substring( 0, epdf_wf_pdf_viewer_strings.site_url.length ) ) {
-			const msg = __( 'Only PDFs hosted by this website and other websites listing this website in a CORS header ‘Access-Control-Allow-Origin’ can load in the viewer.', 'embed-pdf-wpforms' )
+			var msg = __( 'Only PDFs hosted by this website and other websites listing this website in a CORS header ‘Access-Control-Allow-Origin’ can load in the viewer.', 'embed-pdf-wpforms' )
 				+ ' <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">' + __( 'Learn about CORS →', 'embed-pdf-wpforms' ) + '</a>';
+
+			// Can the user upload files into the Media Library?
+			if ( epdf_wf_pdf_viewer_strings.can_upload_files ) {
+				msg += sprintf(
+					'<br /><br /><button id="download_pdf_media" class="wpforms-btn wpforms-btn-sm" data-field="%1$s">%2$s</button>',
+					e.target.getAttribute('name').replaceAll( /[^0-9]+/g, '' ), // Replace all non-digits with empty string.
+					__( 'Download PDF into Media Library', 'embed-pdf-wpforms' )
+				);
+			}
 			wpformsSetFieldError( e.target, msg );
+			if ( epdf_wf_pdf_viewer_strings.can_upload_files ) {
+				// Add handler to Download PDF button.
+				document.querySelector( '#download_pdf_media' ).addEventListener( 'click', handleDownloadClick );
+			}
+			return;
 		}
 
 		// Does the file exist?
@@ -107,6 +122,50 @@
 		file_frame.open();
 
 		// Don't submit forms.
+		return false;
+	}
+
+	function handleDownloadClick (e) {
+		e.preventDefault();
+		field = e.target.dataset.field
+		var url = document.getElementById('wpforms-field-option-' + field + '-pdf_url').value;
+		// Is the URL valid?
+		if ( ! isValidHttpUrl( url ) ) {
+			setFieldError(
+				'pdf_url_setting',
+				'below',
+				__( 'Please enter a valid URL.', 'embed-pdf-wpforms' )
+			);
+			return;
+		}
+
+		// Make an AJAX call to obtain the file.
+		fetch( epdf_wf_pdf_viewer_strings.ajax_url, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body: new URLSearchParams({
+				action: 'epdf_wf_download_pdf_media',
+				_ajax_nonce: epdf_wf_pdf_viewer_strings.nonce,
+				url: url,
+			}).toString()
+		})
+		.then((response) => response.json())
+		.then((responseObj) => {
+			if ( responseObj ) {
+				var urlEl = document.getElementById('wpforms-field-option-' + field + '-pdf_url');
+				if ( responseObj.data.url && isValidHttpUrl( responseObj.data.url ?? '' ) ) {
+					urlEl.value = responseObj.data.url;
+					// Clear the error.
+					wpformsResetFieldError( urlEl );
+				} else if ( ! responseObj.success && responseObj.data.msg ) {
+					wpformsSetFieldError( urlEl, responseObj.data.msg );
+				}
+			}
+		})
+		.catch((error) => {
+			console.error( '[Embed PDF for WPForms] Download failed.' );
+			console.error( error );
+		});
 		return false;
 	}
 
