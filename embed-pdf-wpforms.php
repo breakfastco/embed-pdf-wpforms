@@ -3,7 +3,7 @@
  * Plugin Name: Embed PDF for WPForms
  * Plugin URI: https://breakfastco.xyz/embed-pdf-wpforms/
  * Description: Add-on for WPForms. Provides a PDF Viewer field.
- * Author: Breakfast Co.
+ * Author: Breakfast
  * Author URI: https://breakfastco.xyz
  * Version: 1.0.1
  * License: GPLv3
