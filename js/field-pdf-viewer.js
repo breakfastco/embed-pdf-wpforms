@@ -13,12 +13,15 @@
 
 	// Spin up script. Initializes all the viewers.
 	window.addEventListener( 'epdf_wf_pdfjs_worker_set', function(e) {
-		window['epdf_wf'] = {};
 		document.querySelectorAll( '.epdf-container canvas.epdf' ).forEach( function( el ) {
-			window['epdf_wf'][el.dataset.field] = {};
 			loadPreview( el.dataset.field, el.dataset.form );
 		});
 	});
+
+	/**
+	 * Private Members
+	 */
+	var pdfDocs = [];
 
 	/**
 	 * Private Methods
@@ -33,7 +36,7 @@
 		if ( 'undefined' === typeof epdfInstance ) {
 			// Something is wrong, spin up data for this this preview is missing.
 			if ( epdf_wf_pdf_viewer_strings.script_debug ) {
-				console.log( '[Embed PDF for WPForms] loadPreview( ' + fieldId + ' ) failed, spin up data missing' );
+				console.error( '[Embed PDF for WPForms] loadPreview( ' + fieldId + ' ) failed, spin up data missing' );
 			}
 			return;
 		}
@@ -42,7 +45,7 @@
 		if ( null === urlEl || '' === urlEl.value ) {
 			// There is no PDF to load.
 			if ( epdf_wf_pdf_viewer_strings.script_debug ) {
-				console.log( '[Embed PDF for WPForms] loadPreview( ' + fieldId + ' ) failed, no PDF URL' );
+				console.error( '[Embed PDF for WPForms] loadPreview( ' + fieldId + ' ) failed, no PDF URL' );
 			}
 			return;
 		}
@@ -64,12 +67,12 @@
 		 * Asynchronously downloads PDF.
 		 */
 		pdfjsLib.getDocument({ url: urlEl.value, verbosity: 0 }).promise.then(function(pdfDoc_) {
-			if (window['epdf_wf'][fieldId]['pdfDoc']) {
-				window['epdf_wf'][fieldId]['pdfDoc'].destroy();
+			if (pdfDocs[fieldId]) {
+				pdfDocs[fieldId].destroy();
 			}
-			window['epdf_wf'][fieldId]['pdfDoc'] = pdfDoc_;
-			document.getElementById( epdfInstance.id + '_page_count').textContent = window['epdf_wf'][fieldId]['pdfDoc'].numPages;
-			window['epdf_wf'][fieldId]['pdfDoc'].currentScaleValue = epdfInstance.dataset.initialScale;
+			pdfDocs[fieldId] = pdfDoc_;
+			document.getElementById( epdfInstance.id + '_page_count').textContent = pdfDocs[fieldId].numPages;
+			pdfDocs[fieldId].currentScaleValue = epdfInstance.dataset.initialScale;
 
 			// Blow up the canvas to 100% width before rendering
 			epdfInstance.style.width = '100%';
@@ -81,8 +84,8 @@
 			togglePrevNextButtons(epdfInstance);
 		}).catch(function(error){
 			if ( epdf_wf_pdf_viewer_strings.script_debug ) {
-				console.log( '[Embed PDF for WPForms]' );
-				console.log( error );
+				console.error( '[Embed PDF for WPForms] Preview failed.' );
+				console.error( error );
 			}
 			// Display an error on the front-end.
 
@@ -124,9 +127,9 @@
 
 		epdfInstance.dataset.pageRendering = true;
 		// Using promise to fetch the page
-		window['epdf_wf'][epdfInstance.dataset.field]['pdfDoc'].getPage(pageNum).then(function(page) {
+		pdfDocs[epdfInstance.dataset.field].getPage(pageNum).then(function(page) {
 
-			var viewport = page.getViewport({scale: window['epdf_wf'][epdfInstance.dataset.field]['pdfDoc'].currentScaleValue});
+			var viewport = page.getViewport({scale: pdfDocs[epdfInstance.dataset.field].currentScaleValue});
 			epdfInstance.height = viewport.height;
 			epdfInstance.width = viewport.width;
 
@@ -174,7 +177,7 @@
 
 	function togglePrevNextButtons( epdfInstance ) {
 		document.getElementById( epdfInstance.id + '_prev').disabled = ( 1 == epdfInstance.dataset.pageNum );
-		document.getElementById( epdfInstance.id + '_next').disabled = ( epdfInstance.dataset.pageNum == window['epdf_wf'][epdfInstance.dataset.field]['pdfDoc'].numPages );
+		document.getElementById( epdfInstance.id + '_next').disabled = ( epdfInstance.dataset.pageNum == pdfDocs[epdfInstance.dataset.field].numPages );
 	}
 
 	/**
@@ -205,7 +208,7 @@
 	 */
 	epdfWf.onNextPage = function(e) {
 		var epdfInstance = canvasElement( e.target.dataset.field, e.target.dataset.form );
-		if (Number(epdfInstance.dataset.pageNum) >= window['epdf_wf'][e.target.dataset.field]['pdfDoc'].numPages) {
+		if (Number(epdfInstance.dataset.pageNum) >= pdfDocs[e.target.dataset.field].numPages) {
 			return;
 		}
 		epdfInstance.dataset.pageNum++;
@@ -221,11 +224,11 @@
 	 */
 	epdfWf.onZoomIn = function(e) {
 		var epdfInstance = canvasElement( e.target.dataset.field, e.target.dataset.form );
-		let newScale = window['epdf_wf'][e.target.dataset.field]['pdfDoc'].currentScaleValue;
+		let newScale = pdfDocs[e.target.dataset.field].currentScaleValue;
 		newScale = (newScale * scaleDeltaDefault()).toFixed(2);
 		newScale = Math.ceil(newScale * 10) / 10;
 		newScale = Math.min(scaleMax(), newScale);
-		window['epdf_wf'][e.target.dataset.field]['pdfDoc'].currentScaleValue = newScale;
+		pdfDocs[e.target.dataset.field].currentScaleValue = newScale;
 		renderPage(epdfInstance, Number(epdfInstance.dataset.pageNum));
 
 		// Dispatch an event about the new scale value.
@@ -241,11 +244,11 @@
 	 */
 	epdfWf.onZoomOut = function(e) {
 		var epdfInstance = canvasElement( e.target.dataset.field, e.target.dataset.form );
-		let newScale = window['epdf_wf'][e.target.dataset.field]['pdfDoc'].currentScaleValue;
+		let newScale = pdfDocs[e.target.dataset.field].currentScaleValue;
 		newScale = (newScale / scaleDeltaDefault()).toFixed(2);
 		newScale = Math.floor(newScale * 10) / 10;
 		newScale = Math.max(scaleMin(), newScale);
-		window['epdf_wf'][e.target.dataset.field]['pdfDoc'].currentScaleValue = newScale;
+		pdfDocs[e.target.dataset.field].currentScaleValue = newScale;
 		renderPage(epdfInstance, Number(epdfInstance.dataset.pageNum));
 
 		// Dispatch an event about the new scale value.
