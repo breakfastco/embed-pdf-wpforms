@@ -96,7 +96,7 @@
 
 	// Choose PDF button click handler in form editor
 	function handleChooseClick (e) {
-		if ( '1' !== epdf_wf_pdf_viewer_strings.can_upload_files ) {
+		if ( ! epdf_wf_pdf_viewer_strings.can_upload_files ) {
 			var urlEl = document.getElementById('wpforms-field-option-' + e.target.dataset.field + '-pdf_url');
 			wpformsSetFieldError( urlEl, __( 'Sorry, you do not have access to the Media Library.', 'embed-pdf-wpforms' ) );
 			return;
