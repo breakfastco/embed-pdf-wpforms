@@ -3,7 +3,7 @@
 Contributors: salzano
 Tags: wpforms, wp forms, pdf, inkless
 Requires at least: 4.0
-Tested up to: 6.3.0
+Tested up to: 6.3.2
 Requires PHP: 5.6
 Stable tag: 1.1.0
 License: GPLv3
@@ -61,6 +61,7 @@ Please create an [Issue on Github](https://github.com/breakfastco/embed-pdf-wpfo
 * [Fixed] Avoid errors when two copies of this plugin are activated at the same time.
 * [Fixed] Adds a "file not found" error to the form editor so users know that PDF files are missing without previewing the form.
 * [Fixed] Changes CSS so the previous, next, zoom in, and zoom out buttons look better on smaller screens.
+* [Changed] Changes the tested up to version to 6.3.2.
 
 = 1.0.1 =
 * [Fixed] Moves inline JavaScript required for each PDF Viewer field to the wpforms_frontend_js hook.
