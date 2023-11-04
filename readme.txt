@@ -14,7 +14,7 @@ An add-on for WPForms. Provides a PDF Viewer field.
 
 == Description ==
  
-Embed PDF for WPForms provides a PDF Viewer field type. Include PDF files in forms without requiring users to download the PDF. Supports multi-page documents. Provides zoom controls.
+Embed PDF for WPForms provides a PDF Viewer field type. Include PDF files in forms without requiring users to download the PDF. Supports multi-page documents for PDF flipbooks in WPForms. Provides zoom controls.
 
 = Features =
 
