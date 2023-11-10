@@ -481,7 +481,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				// Is the populated value a URL?
 				if ( filter_var( $field['properties']['inputs']['primary']['attr']['value'], FILTER_VALIDATE_URL ) ) {
 					// Yes.
-					$url = esc_url( $field['properties']['inputs']['primary']['attr']['value'] );
+					$url = esc_url( $field['properties']['inputs']['primary']['attr']['value'] ?? '' );
 				}
 			}
 
