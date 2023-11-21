@@ -20,9 +20,9 @@ Embed PDF for WPForms provides a PDF Viewer field type. Include PDF files in for
 
 * Drag a PDF Viewer field onto any WPForm
 * Choose PDF from Media Library or provide local URL
+* Set default zoom level
 * Supports multi-page PDFs
 * Supports Dynamic Population
-* Initial Scale setting changes default zoom level
 
 = Demo =
 
