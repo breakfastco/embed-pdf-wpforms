@@ -3,9 +3,9 @@
 Contributors: salzano
 Tags: wpforms, wp forms, pdf, inkless
 Requires at least: 4.0
-Tested up to: 6.3.2
+Tested up to: 6.4.1
 Requires PHP: 5.6
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
  
@@ -63,6 +63,10 @@ Please create an [Issue on Github](https://github.com/breakfastco/embed-pdf-wpfo
 
 == Changelog ==
 
+= 1.1.1 =
+* [Added] Adds comments explaining what pdfjs-dist is and where the unminimized files are available.
+* [Changed] Changes tested up to version to 6.4.1.
+
 = 1.1.0 =
 * [Added] Adds a Download PDF into Media Library button to the CORS error messages for users that have the upload_files capability.
 * [Fixed] Fixes the Choose PDF button not working for users without access to the Media Library by telling users why it does not work. The upload_files capability is required to use the Media Library dashboard features like the modal this button opens.
@@ -80,6 +84,9 @@ Please create an [Issue on Github](https://github.com/breakfastco/embed-pdf-wpfo
 
 
 == Upgrade Notice ==
+
+= 1.1.1 =
+Adds comments explaining what pdfjs-dist is and where the unminimized files are available. Changes tested up to version to 6.4.1.
 
 = 1.0.0 =
 First version.
