@@ -7,7 +7,7 @@
  * Author URI: https://breakfastco.xyz
  * Version: 1.1.1
  * License: GPLv3
- * Text Domain: 'embed-pdf-wpforms'
+ * Text Domain: embed-pdf-wpforms
  *
  * @author Corey Salzano <csalzano@duck.com>
  * @package embed-pdf-wpforms
