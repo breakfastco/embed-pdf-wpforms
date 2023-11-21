@@ -116,11 +116,24 @@ if ( class_exists( 'WPForms_Field' ) ) {
 		 * @return void
 		 */
 		public function assets_register() {
-			// pdf.js.
+			/*
+			 * js/pdfjs/pdf.min.js
+			 * js/pdfjs/pdf.worker.min.js
+			 *
+			 * These files are part of the pdfjs-dist package at
+			 * https://www.npmjs.com/package/pdfjs-dist. They are built by the
+			 * `gulp dist` command in https://github.com/mozilla/pdf.js. To
+			 * obtain the unminimzed scripts or build pdfjs-dist yourself, use
+			 * these commands:
+			 *     git clone https://github.com/mozilla/pdf.js
+			 *     cd pdf.js
+			 *     npm install
+			 *     gulp dist
+			 */
 			$handle = 'epdf_wf_pdfjs';
 			wp_register_script(
 				$handle,
-				plugins_url( 'js/pdfjs/pdf.min.js', EMBED_PDF_WPFORMS_PATH ), // No un-minimized version of this script included.
+				plugins_url( 'js/pdfjs/pdf.min.js', EMBED_PDF_WPFORMS_PATH ),
 				array(),
 				EMBED_PDF_WPFORMS_VERSION,
 				true
@@ -129,7 +142,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				$handle,
 				'const epdf_wf_pdfjs_strings = ' . wp_json_encode(
 					array(
-						'url_worker'        => plugins_url( 'js/pdfjs/pdf.worker.min.js', EMBED_PDF_WPFORMS_PATH ), // No unminimized version of this script included.
+						'url_worker'        => plugins_url( 'js/pdfjs/pdf.worker.min.js', EMBED_PDF_WPFORMS_PATH ),
 						'initial_scale'     => self::DEFAULT_SCALE_VALUE,
 						'is_user_logged_in' => is_user_logged_in(),
 					)

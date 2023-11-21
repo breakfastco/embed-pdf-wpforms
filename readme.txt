@@ -38,6 +38,14 @@ Have an idea for a new feature? Please create an Issue on Github or Support Topi
 1. Open the form editor through the 'Forms' menu in WordPress
 1. Add a 'PDF Viewer' field from the Advanced Fields tab in the form editor.
 
+= pdfjs-dist package =
+
+This plugin includes https://www.npmjs.com/package/pdfjs-dist, which contains combined and minimized scripts built by the `gulp dist` command in https://github.com/mozilla/pdf.js. No unusual or additional action is required to download or install this plugin. If you wish to obtain the unminimzed scripts or build pdfjs-dist yourself, use these commands:
+
+git clone https://github.com/mozilla/pdf.js
+cd pdf.js
+npm install
+gulp dist
 
 == Frequently Asked Questions ==
  
