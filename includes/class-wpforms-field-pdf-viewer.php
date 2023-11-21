@@ -64,7 +64,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				wp_send_json_error();
 			}
 
-			$url = sanitize_url( wp_unslash( $_POST['url'] ) );
+			$url = esc_url_raw( wp_unslash( $_POST['url'] ) );
 
 			// Download the file.
 			$tmp_file = download_url( $url );
