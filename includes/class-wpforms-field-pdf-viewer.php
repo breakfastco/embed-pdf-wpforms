@@ -461,7 +461,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 					. '<span class="zoom"><button class="wpforms-page-button button" onclick="return false" id="%1$s_zoom_out" data-field="%7$s" data-form="%9$s" title="%5$s">%5$s</button> <button class="wpforms-page-button button" onclick="return false" id="%1$s_zoom_in" data-field="%7$s" data-form="%9$s" title="%6$s">%6$s</button></span>'
 					. '</div>'
 					. '<div class="epdf-container"><canvas id="%1$s" class="epdf" data-initial-scale="%8$s" data-page-num="1" data-page-pending="" data-rendering="false" data-field="%7$s" data-form="%9$s"></canvas></div>'
-					. '<input %10$s />',
+					. '<input id="%10$s" type="%11$s" name="%12$s" value="%13$s" />',
 				/* 1 */ esc_attr( $canvas_id ),
 				/* 2 */ esc_html__( 'Previous', 'embed-pdf-wpforms' ),
 				/* 3 */ esc_html__( 'Next', 'embed-pdf-wpforms' ),
@@ -471,7 +471,10 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				/* 7 */ esc_attr( $field_id ),
 				/* 8 */ esc_attr( $initial_scale ),
 				/* 9 */ esc_attr( $form_id ),
-				/*10 */ wpforms_html_attributes( $primary['id'], array(), array(), $primary['atts'] ),
+				/*10 */ esc_attr( $primary['id'] ),
+				/*11 */ esc_attr( $primary['atts']['type'] ),
+				/*12 */ esc_attr( $primary['atts']['name'] ),
+				/*13 */ esc_attr( $primary['atts']['value'] ),
 			);
 		}
 
