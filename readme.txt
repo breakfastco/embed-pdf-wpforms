@@ -35,8 +35,8 @@ Have an idea for a new feature? Please create an Issue on Github or Support Topi
  
 1. Search for Embed PDF for WPForms in the Add New tab of the dashboard plugins page and press the Install Now button
 1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Open the form editor through the 'Forms' menu in WordPress
-1. Add a 'PDF Viewer' field from the Advanced Fields tab in the form editor.
+1. Open the form editor through the 'WPForms' menu in WordPress
+1. Add a 'PDF Viewer' field from the Standard Fields tab in the form editor.
 
 = pdfjs-dist package =
 
