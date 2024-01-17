@@ -3,9 +3,9 @@
 Contributors: salzano
 Tags: wpforms, wp forms, pdf, inkless
 Requires at least: 4.0
-Tested up to: 6.4.1
+Tested up to: 6.4.2
 Requires PHP: 5.6
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
  
@@ -40,7 +40,7 @@ Have an idea for a new feature? Please create an Issue on Github or Support Topi
 
 = pdfjs-dist package =
 
-This plugin includes https://www.npmjs.com/package/pdfjs-dist, which contains combined and minimized scripts built by the `gulp dist` command in https://github.com/mozilla/pdf.js. No unusual or additional action is required to download or install this plugin. If you wish to obtain the unminimzed scripts or build pdfjs-dist yourself, use these commands:
+This plugin includes https://www.npmjs.com/package/pdfjs-dist, which contains combined and minimized scripts built by the `gulp dist` command in https://github.com/mozilla/pdf.js. No unusual or additional action is required to download or install this plugin. If you wish to obtain the unminimized scripts or build pdfjs-dist yourself, use these commands:
 
 git clone https://github.com/mozilla/pdf.js
 cd pdf.js
@@ -63,6 +63,11 @@ Please create an [Issue on Github](https://github.com/breakfastco/embed-pdf-wpfo
 
 == Changelog ==
 
+= 1.1.2 =
+* [Fixed] Adds compatibility with language packs for translation.
+* [Changed] Changes the detail sent in JavaScript event epdf_gf_render_page from an integer to an object.
+* [Changed] Changes tested up to version to 6.4.2.
+
 = 1.1.1 =
 * [Added] Adds comments explaining what pdfjs-dist is and where the unminimized files are available.
 * [Changed] Changes tested up to version to 6.4.1.
@@ -84,6 +89,9 @@ Please create an [Issue on Github](https://github.com/breakfastco/embed-pdf-wpfo
 
 
 == Upgrade Notice ==
+
+= 1.1.2 =
+Adds compatibility with language packs for translation. Changes the detail sent in JavaScript event epdf_gf_render_page from an integer to an object. Changes tested up to version to 6.4.2.
 
 = 1.1.1 =
 Adds comments explaining what pdfjs-dist is and where the unminimized files are available. Changes tested up to version to 6.4.1.

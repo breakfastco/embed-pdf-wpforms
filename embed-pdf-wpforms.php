@@ -5,7 +5,7 @@
  * Description: Add-on for WPForms. Provides a PDF Viewer field.
  * Author: Breakfast
  * Author URI: https://breakfastco.xyz
- * Version: 1.1.1
+ * Version: 1.1.2
  * License: GPLv3
  * Text Domain: embed-pdf-wpforms
  *

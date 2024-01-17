@@ -123,7 +123,7 @@ if ( class_exists( 'WPForms_Field' ) ) {
 			 * These files are part of the pdfjs-dist package at
 			 * https://www.npmjs.com/package/pdfjs-dist. They are built by the
 			 * `gulp dist` command in https://github.com/mozilla/pdf.js. To
-			 * obtain the unminimzed scripts or build pdfjs-dist yourself, use
+			 * obtain the unminimized scripts or build pdfjs-dist yourself, use
 			 * these commands:
 			 *     git clone https://github.com/mozilla/pdf.js
 			 *     cd pdf.js
