@@ -19,7 +19,7 @@ if ( ! defined( 'EMBED_PDF_WPFORMS_PATH' ) ) {
 	define( 'EMBED_PDF_WPFORMS_PATH', __FILE__ );
 }
 if ( ! defined( 'EMBED_PDF_WPFORMS_VERSION' ) ) {
-	define( 'EMBED_PDF_WPFORMS_VERSION', '1.1.1' );
+	define( 'EMBED_PDF_WPFORMS_VERSION', '1.1.2' );
 }
 
 if ( ! function_exists( 'embed_pdf_wpforms_init' ) ) {
