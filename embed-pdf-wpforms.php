@@ -30,9 +30,6 @@ if ( ! function_exists( 'embed_pdf_wpforms_init' ) ) {
 	 * @return void
 	 */
 	function embed_pdf_wpforms_init() {
-		// Add compatibility with language packs.
-		add_action( 'init', 'embed_pdf_wpforms_load_textdomain' );
-
 		if ( ! class_exists( 'WPForms_Field' ) ) {
 			return;
 		}
@@ -54,6 +51,11 @@ if ( ! function_exists( 'embed_pdf_wpforms_init' ) ) {
 		$allowed_form_fields[] = 'pdf_viewer';
 		return $allowed_form_fields;
 	}
+}
+
+if ( ! function_exists( 'embed_pdf_wpforms_load_textdomain' ) ) {
+	// Add compatibility with language packs.
+	add_action( 'init', 'embed_pdf_wpforms_load_textdomain' );
 
 	/**
 	 * Loads translated strings.
