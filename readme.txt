@@ -5,7 +5,7 @@ Tags: wpforms, wp forms, pdf, inkless
 Requires at least: 4.0
 Tested up to: 6.7.1
 Requires PHP: 5.6
-Stable tag: 1.1.3
+Stable tag: 1.1.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
  
@@ -63,6 +63,10 @@ Please create an [Issue on Github](https://github.com/breakfastco/embed-pdf-wpfo
 
 == Changelog ==
 
+= 1.1.4 =
+* [Added] Includes all translation files in a folder /languages.
+* [Changed] Bumps tested up to version to 6.7.1.
+
 = 1.1.3 =
 * [Fixed] Adds compatibility with language packs for translation. For real this time.
 
@@ -92,6 +96,9 @@ Please create an [Issue on Github](https://github.com/breakfastco/embed-pdf-wpfo
 
 
 == Upgrade Notice ==
+
+= 1.1.4 =
+Includes all translation files in a folder /languages. Bumps tested up to version to 6.7.1.
 
 = 1.1.3 =
 Adds compatibility with language packs for translation.
