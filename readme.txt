@@ -3,7 +3,7 @@
 Contributors: salzano
 Tags: wpforms, wp forms, pdf, inkless
 Requires at least: 4.0
-Tested up to: 6.4.2
+Tested up to: 6.7.1
 Requires PHP: 5.6
 Stable tag: 1.1.3
 License: GPLv3
