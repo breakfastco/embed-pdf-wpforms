@@ -1,0 +1,135 @@
+# Translation of Plugins - Embed PDF for WPForms - Stable (latest release) in Spanish (Colombia)
+# This file is distributed under the same license as the Plugins - Embed PDF for WPForms - Stable (latest release) package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2024-07-11 02:18:55+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: GlotPress/4.0.1\n"
+"Language: es_CO\n"
+"Project-Id-Version: Plugins - Embed PDF for WPForms - Stable (latest release)\n"
+
+#: js/form-editor.js:108
+msgid "Load"
+msgstr "Cargar"
+
+#: js/form-editor.js:101
+msgid "Sorry, you do not have access to the Media Library."
+msgstr "Lo sentimos, no tiene acceso a la Biblioteca Multimedia."
+
+#: js/form-editor.js:94
+msgid "No file exists at the provided URL."
+msgstr "No existe ningún archivo en la URL proporcionada."
+
+#: js/form-editor.js:82
+msgid "Download PDF into Media Library"
+msgstr "Descargar un PDF en la Biblioteca Multimedia"
+
+#: js/form-editor.js:75
+msgid "Learn about CORS →"
+msgstr "Aprende más sobre CORS →"
+
+#: js/form-editor.js:74
+msgid "Only PDFs hosted by this website and other websites listing this website in a CORS header ‘Access-Control-Allow-Origin’ can load in the viewer."
+msgstr "Sólo los PDF alojados en este sitio web y otros sitios web que incluyan este sitio web en un header CORS 'Access-Control-Allow-Origin' pueden cargarse."
+
+#: js/form-editor.js:69 js/form-editor.js:142
+msgid "Please enter a valid URL."
+msgstr "Por favor introduce una URL válida."
+
+#: js/field-pdf-viewer.js:97
+msgid "Troubleshooting →"
+msgstr "Reportar un problema →"
+
+#: js/field-pdf-viewer.js:95
+msgid "PDF Viewer Error:"
+msgstr "Error de Visor PDF:"
+
+#: includes/class-wpforms-field-pdf-viewer.php:470
+msgid "Zoom In"
+msgstr "Ampliar"
+
+#: includes/class-wpforms-field-pdf-viewer.php:469
+msgid "Zoom Out"
+msgstr "Reducir"
+
+#: includes/class-wpforms-field-pdf-viewer.php:468
+msgid "Page:"
+msgstr "Página:"
+
+#: includes/class-wpforms-field-pdf-viewer.php:467
+msgid "Next"
+msgstr "Siguiente"
+
+#: includes/class-wpforms-field-pdf-viewer.php:466
+msgid "Previous"
+msgstr "Anterior"
+
+#. translators: 1: field ID, 2: form ID.
+#: includes/class-wpforms-field-pdf-viewer.php:436
+msgid "No PDF to load into field %1$s on form %2$s"
+msgstr "Ningún PDF para cargar en el campo %1$s en el formulario %2$s"
+
+#: includes/class-wpforms-field-pdf-viewer.php:407
+msgid "Contents of this field are not displayed in the form builder preview."
+msgstr "El contenido de este campo no se muestra en la vista previa del generador de formularios."
+
+#: includes/class-wpforms-field-pdf-viewer.php:320
+#: includes/class-wpforms-field-pdf-viewer.php:340
+msgid "Loading too small to read? Increase this value to zoom in."
+msgstr "¿Demasiada pequeña para leerla? Aumente este valor para ampliar."
+
+#: includes/class-wpforms-field-pdf-viewer.php:319
+msgid "Initial Scale"
+msgstr "Escala Inicial"
+
+#: includes/class-wpforms-field-pdf-viewer.php:306 js/form-editor.js:106
+msgid "Choose PDF"
+msgstr "Seleccionar PDF"
+
+#: includes/class-wpforms-field-pdf-viewer.php:285
+msgid "Enter the URL of the PDF to load into the viewer."
+msgstr "Introduce la URL del PDF para cargarlo en el visor."
+
+#: includes/class-wpforms-field-pdf-viewer.php:284
+msgid "PDF"
+msgstr "PDF"
+
+#. translators: 1. An external URL.
+#: includes/class-wpforms-field-pdf-viewer.php:99
+msgid "Downloaded from %s by Embed PDF for WPForms"
+msgstr "Descargado de %s por Integrador PDF para WPForms"
+
+#. translators: 1. An error message.
+#: includes/class-wpforms-field-pdf-viewer.php:75
+msgid "The download failed with error \"%s\""
+msgstr "La descarga falló con el error \"%s\""
+
+#: includes/class-wpforms-field-pdf-viewer.php:33
+#: includes/class-wpforms-field-pdf-viewer.php:399
+#: includes/class-wpforms-field-pdf-viewer.php:402
+msgid "PDF Viewer"
+msgstr "Visor PDF"
+
+#. Author URI of the plugin
+msgid "https://breakfastco.xyz"
+msgstr "https://breakfastco.xyz"
+
+#. Author of the plugin
+msgid "Breakfast"
+msgstr "Breakfast"
+
+#. Description of the plugin
+msgid "Add-on for WPForms. Provides a PDF Viewer field."
+msgstr "Add-on para WPForms. Proporciona un campo de Visor PDF."
+
+#. Plugin URI of the plugin
+msgid "https://breakfastco.xyz/embed-pdf-wpforms/"
+msgstr "https://breakfastco.xyz/embed-pdf-wpforms/"
+
+#. Plugin Name of the plugin
+#: includes/class-wpforms-field-pdf-viewer.php:438
+msgid "Embed PDF for WPForms"
+msgstr "Integrador PDF para WPForms"
