@@ -30,7 +30,8 @@ if ( class_exists( 'WPForms_Field' ) ) {
 		public function init() {
 
 			// Define field type information.
-			$this->name  = esc_html__( 'PDF Viewer', 'embed-pdf-wpforms' );
+			// This runs on the wpforms_loaded hook, before init, so we can't use translations here.
+			$this->name  = 'PDF Viewer';
 			$this->type  = 'pdf_viewer';
 			$this->icon  = 'fa-caret-square-o-down';
 			$this->order = 200;
