@@ -3,9 +3,9 @@
 Contributors: salzano
 Tags: wpforms, wp forms, pdf, inkless
 Requires at least: 4.0
-Tested up to: 6.7.1
+Tested up to: 6.8.2
 Requires PHP: 5.6
-Stable tag: 1.1.4
+Stable tag: 1.1.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
  
@@ -63,6 +63,9 @@ Please create an [Issue on Github](https://github.com/breakfastco/embed-pdf-wpfo
 
 == Changelog ==
 
+= 1.1.5 =
+* [Fixed] Bug fix to suppress the notice "Function _load_textdomain_just_in_time was called incorrectly."
+
 = 1.1.4 =
 * [Added] Includes all translation files in a folder /languages.
 * [Changed] Bumps tested up to version to 6.7.1.
@@ -96,6 +99,9 @@ Please create an [Issue on Github](https://github.com/breakfastco/embed-pdf-wpfo
 
 
 == Upgrade Notice ==
+
+= 1.1.5 =
+Bug fix to suppress the notice "Function _load_textdomain_just_in_time was called incorrectly."
 
 = 1.1.4 =
 Includes all translation files in a folder /languages. Bumps tested up to version to 6.7.1.
