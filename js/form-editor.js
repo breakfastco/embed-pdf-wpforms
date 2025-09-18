@@ -70,12 +70,12 @@
 			return;
 
 		// Is it a local URL?
-		} else if ( epdf_wf_pdf_viewer_strings.site_url !== e.target.value.substring( 0, epdf_wf_pdf_viewer_strings.site_url.length ) ) {
+		} else if ( epdf_wf_form_editor_strings.site_url !== e.target.value.substring( 0, epdf_wf_form_editor_strings.site_url.length ) ) {
 			var msg = __( 'Only PDFs hosted by this website and other websites listing this website in a CORS header ‘Access-Control-Allow-Origin’ can load in the viewer.', 'embed-pdf-wpforms' )
 				+ ' <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">' + __( 'Learn about CORS →', 'embed-pdf-wpforms' ) + '</a>';
 
 			// Can the user upload files into the Media Library?
-			if ( epdf_wf_pdf_viewer_strings.can_upload_files ) {
+			if ( epdf_wf_form_editor_strings.can_upload_files ) {
 				msg += sprintf(
 					'<br /><br /><button id="download_pdf_media" class="wpforms-btn wpforms-btn-sm" data-field="%1$s">%2$s</button>',
 					e.target.getAttribute('name').replaceAll( /[^0-9]+/g, '' ), // Replace all non-digits with empty string.
@@ -83,7 +83,7 @@
 				);
 			}
 			wpformsSetFieldError( e.target, msg );
-			if ( epdf_wf_pdf_viewer_strings.can_upload_files ) {
+			if ( epdf_wf_form_editor_strings.can_upload_files ) {
 				// Add handler to Download PDF button.
 				document.querySelector( '#download_pdf_media' ).addEventListener( 'click', handleDownloadClick );
 			}
@@ -96,7 +96,7 @@
 
 	// Choose PDF button click handler in form editor
 	function handleChooseClick (e) {
-		if ( ! epdf_wf_pdf_viewer_strings.can_upload_files ) {
+		if ( ! epdf_wf_form_editor_strings.can_upload_files ) {
 			var urlEl = document.getElementById('wpforms-field-option-' + e.target.dataset.field + '-pdf_url');
 			wpformsSetFieldError( urlEl, __( 'Sorry, you do not have access to the Media Library.', 'embed-pdf-wpforms' ) );
 			return;
@@ -145,12 +145,12 @@
 		}
 
 		// Make an AJAX call to obtain the file.
-		fetch( epdf_wf_pdf_viewer_strings.ajax_url, {
+		fetch( epdf_wf_form_editor_strings.ajax_url, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 			body: new URLSearchParams({
 				action: 'epdf_wf_download_pdf_media',
-				_ajax_nonce: epdf_wf_pdf_viewer_strings.nonce,
+				_ajax_nonce: epdf_wf_form_editor_strings.nonce,
 				url: url,
 			}).toString()
 		})
@@ -188,7 +188,7 @@
 
 	var controller = new AbortController();
 	const localFileExists = file => {
-		if ( epdf_wf_pdf_viewer_strings.site_url !== file.substring( 0, epdf_wf_pdf_viewer_strings.site_url.length ) ) {
+		if ( epdf_wf_form_editor_strings.site_url !== file.substring( 0, epdf_wf_form_editor_strings.site_url.length ) ) {
 			return Promise.resolve(false);
 		}
 		controller = new AbortController();

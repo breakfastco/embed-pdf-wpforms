@@ -181,23 +181,32 @@ if ( class_exists( 'WPForms_Field' ) ) {
 				$handle,
 				'const epdf_wf_pdf_viewer_strings = ' . wp_json_encode(
 					array(
-						'site_url'         => site_url(),
-						'script_debug'     => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
-						'can_upload_files' => current_user_can( 'upload_files' ),
-						'ajax_url'         => admin_url( 'admin-ajax.php' ),
-						'nonce'            => wp_create_nonce( 'epdf_wf_download_pdf_media' ),
+						'script_debug' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
 					)
 				),
 				'before'
 			);
 
 			// Script for the Builder.
+			$handle = 'epdf_wf_form_editor';
 			wp_register_script(
-				'epdf_wf_form_editor',
+				$handle,
 				plugins_url( "js/form-editor{$min}.js", EMBED_PDF_WPFORMS_PATH ),
 				array( 'wp-i18n', 'epdf_wf_pdfjs', 'jquery' ),
 				EMBED_PDF_WPFORMS_VERSION,
 				true
+			);
+			wp_add_inline_script(
+				$handle,
+				'const epdf_wf_form_editor_strings = ' . wp_json_encode(
+					array(
+						'ajax_url'         => admin_url( 'admin-ajax.php' ),
+						'can_upload_files' => current_user_can( 'upload_files' ),
+						'nonce'            => wp_create_nonce( 'epdf_wf_download_pdf_media' ),
+						'site_url'         => site_url(),
+					)
+				),
+				'before'
 			);
 
 			// CSS for the Builder.
