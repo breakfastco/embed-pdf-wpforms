@@ -61,11 +61,27 @@ if ( class_exists( 'WPForms_Field' ) ) {
 		public function ajax_handler_download_pdf_media() {
 			check_ajax_referer( 'epdf_wf_download_pdf_media' );
 
+			if ( ! current_user_can( 'upload_files' ) ) {
+				wp_send_json_error(
+					array(
+						'msg' => __( 'The download failed', 'embed-pdf-wpforms' ),
+					)
+				);
+			}
+
 			if ( empty( $_POST['url'] ) ) {
 				wp_send_json_error();
 			}
 
 			$url = esc_url_raw( wp_unslash( $_POST['url'] ) );
+
+			if ( ! wp_check_filetype( basename( $url ) )['type'] ) {
+				wp_send_json_error(
+					array(
+						'msg' => __( 'The download failed', 'embed-pdf-wpforms' ),
+					)
+				);
+			}
 
 			// Download the file.
 			$tmp_file = download_url( $url );
