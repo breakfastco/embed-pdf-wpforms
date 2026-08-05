@@ -481,10 +481,10 @@ if ( class_exists( 'WPForms_Field' ) ) {
 			printf(
 				'<div class="epdf-controls-container">'
 					// Paging controls.
-					. '<span class="page"><button class="wpforms-page-button button" onclick="return false" id="%1$s_prev" data-field="%7$s" data-form="%9$s" title="%2$s">%2$s</button> <button class="wpforms-page-button button" onclick="return false" id="%1$s_next" data-field="%7$s" data-form="%9$s" title="%3$s">%3$s</button></span> '
+					. '<span class="page"><button type="button" class="wpforms-page-button button" onclick="return false" id="%1$s_prev" data-field="%7$s" data-form="%9$s" title="%2$s">%2$s</button> <button type="button" class="wpforms-page-button button" onclick="return false" id="%1$s_next" data-field="%7$s" data-form="%9$s" title="%3$s">%3$s</button></span> '
 					. '<span class="paging">%4$s <span id="%1$s_page_num"></span> / <span id="%1$s_page_count"></span></span> '
 					// Zoom controls.
-					. '<span class="zoom"><button class="wpforms-page-button button" onclick="return false" id="%1$s_zoom_out" data-field="%7$s" data-form="%9$s" title="%5$s">%5$s</button> <button class="wpforms-page-button button" onclick="return false" id="%1$s_zoom_in" data-field="%7$s" data-form="%9$s" title="%6$s">%6$s</button></span>'
+					. '<span class="zoom"><button type="button" class="wpforms-page-button button" onclick="return false" id="%1$s_zoom_out" data-field="%7$s" data-form="%9$s" title="%5$s">%5$s</button> <button type="button" class="wpforms-page-button button" onclick="return false" id="%1$s_zoom_in" data-field="%7$s" data-form="%9$s" title="%6$s">%6$s</button></span>'
 					. '</div>'
 					. '<div class="epdf-container"><canvas id="%1$s" class="epdf" data-initial-scale="%8$s" data-page-num="1" data-page-pending="" data-rendering="false" data-field="%7$s" data-form="%9$s"></canvas></div>'
 					. '<input id="%10$s" type="%11$s" name="%12$s" value="%13$s" />',
