@@ -51,6 +51,34 @@ if ( class_exists( 'WPForms_Field' ) ) {
 
 			// AJAX handler for the Download PDF into Media Library button.
 			add_action( 'wp_ajax_epdf_wf_download_pdf_media', array( $this, 'ajax_handler_download_pdf_media' ) );
+
+			// pdf.js ships as ESM; force type="module" on its script tag.
+			add_filter( 'script_loader_tag', array( $this, 'script_loader_tag_module' ), 10, 3 );
+		}
+
+		/**
+		 * Marks the pdf.js bootstrap script as an ES module.
+		 *
+		 * @param string $tag    The script tag.
+		 * @param string $handle The script handle.
+		 * @param string $src    The script source.
+		 * @return string
+		 */
+		public function script_loader_tag_module( $tag, $handle, $src ) {
+			if ( 'epdf_wf_pdfjs' !== $handle ) {
+				return $tag;
+			}
+
+			/*
+			 * script_loader_tag receives inline before/after scripts concatenated
+			 * with the external tag. Only mark the external src script as a module.
+			 */
+			return preg_replace(
+				'/<script(?![^>]*\btype=)([^>]*\bsrc=)/',
+				'<script type="module"$1',
+				$tag,
+				1
+			);
 		}
 
 		/**
@@ -134,36 +162,35 @@ if ( class_exists( 'WPForms_Field' ) ) {
 		 */
 		public function assets_register() {
 			/*
+			 * js/pdfjs-bootstrap.js
 			 * js/pdfjs/pdf.min.js
 			 * js/pdfjs/pdf.worker.min.js
 			 *
-			 * These files are part of the pdfjs-dist package at
-			 * https://www.npmjs.com/package/pdfjs-dist. They are built by the
-			 * `gulp dist` command in https://github.com/mozilla/pdf.js. To
-			 * obtain the unminimized scripts or build pdfjs-dist yourself, use
-			 * these commands:
-			 *     git clone https://github.com/mozilla/pdf.js
-			 *     cd pdf.js
-			 *     npm install
-			 *     gulp dist
+			 * These files come from the pdfjs-dist package at
+			 * https://www.npmjs.com/package/pdfjs-dist (Mozilla PDF.js).
+			 * Rebuild with: npm install && npm run build
 			 */
 			$handle = 'epdf_wf_pdfjs';
 			wp_register_script(
 				$handle,
-				plugins_url( 'js/pdfjs/pdf.min.js', EMBED_PDF_WPFORMS_PATH ),
+				plugins_url( 'js/pdfjs-bootstrap.js', EMBED_PDF_WPFORMS_PATH ),
 				array(),
 				EMBED_PDF_WPFORMS_VERSION,
 				true
 			);
 			wp_add_inline_script(
 				$handle,
-				'const epdf_wf_pdfjs_strings = ' . wp_json_encode(
+				'window.epdf_wf_pdfjs_strings = ' . wp_json_encode(
 					array(
-						'url_worker'        => plugins_url( 'js/pdfjs/pdf.worker.min.js', EMBED_PDF_WPFORMS_PATH ),
+						'url_worker'        => add_query_arg(
+							'ver',
+							EMBED_PDF_WPFORMS_VERSION,
+							plugins_url( 'js/pdfjs/pdf.worker.min.js', EMBED_PDF_WPFORMS_PATH )
+						),
 						'initial_scale'     => self::DEFAULT_SCALE_VALUE,
 						'is_user_logged_in' => is_user_logged_in(),
 					)
-				),
+				) . ';',
 				'before'
 			);
 

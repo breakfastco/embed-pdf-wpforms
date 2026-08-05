@@ -1,31 +1,30 @@
 (function( epdfWf, undefined ) {
-	
-	// Loading, paging, & zooming pdf.js viewers
-	window.addEventListener( 'load', function(e) {
-		// The workerSrc property shall be specified.
-		if ( 'undefined' !== typeof pdfjsLib ) {
-			pdfjsLib.GlobalWorkerOptions.workerSrc = epdf_wf_pdfjs_strings.url_worker;
-			// Dispatch an event after pdfjs is ready.
-			const event = new CustomEvent( 'epdf_wf_pdfjs_worker_set' );
-			window.dispatchEvent(event);
-		}
+
+	// Spin up script. Initializes all the viewers after the ESM bootstrap loads.
+	window.addEventListener( 'epdf_wf_pdfjs_worker_set', function(e) {
+		initViewers();
 	});
 
-	// Spin up script. Initializes all the viewers.
-	window.addEventListener( 'epdf_wf_pdfjs_worker_set', function(e) {
-		document.querySelectorAll( '.epdf-container canvas.epdf' ).forEach( function( el ) {
-			loadPreview( el.dataset.field, el.dataset.form );
-		});
-	});
+	// If the module finished before this classic script registered its listener.
+	if ( 'undefined' !== typeof pdfjsLib ) {
+		initViewers();
+	}
 
 	/**
 	 * Private Members
 	 */
 	var pdfDocs = [];
+	var pdfLoadingTasks = [];
 
 	/**
 	 * Private Methods
 	 */
+
+	function initViewers() {
+		document.querySelectorAll( '.epdf-container canvas.epdf' ).forEach( function( el ) {
+			loadPreview( el.dataset.field, el.dataset.form );
+		});
+	}
 
 	function canvasElement( fieldId, formId ) {
 		return document.querySelector( '.epdf-container canvas.epdf#wpforms-' + formId + '-canvas_' + fieldId );
@@ -33,7 +32,7 @@
 
 	function loadPreview( fieldId, formId ) {
 		var epdfInstance = canvasElement( fieldId, formId );
-		if ( 'undefined' === typeof epdfInstance ) {
+		if ( 'undefined' === typeof epdfInstance || null === epdfInstance ) {
 			// Something is wrong, spin up data for this this preview is missing.
 			if ( epdf_wf_pdf_viewer_strings.script_debug ) {
 				console.error( '[Embed PDF for WPForms] loadPreview( ' + fieldId + ' ) failed, spin up data missing' );
@@ -66,10 +65,12 @@
 		/**
 		 * Asynchronously downloads PDF.
 		 */
-		pdfjsLib.getDocument({ url: urlEl.value, verbosity: 0 }).promise.then(function(pdfDoc_) {
-			if (pdfDocs[fieldId]) {
-				pdfDocs[fieldId].destroy();
-			}
+		if ( pdfLoadingTasks[fieldId] ) {
+			pdfLoadingTasks[fieldId].destroy();
+		}
+		var loadingTask = pdfjsLib.getDocument({ url: urlEl.value, verbosity: 0 });
+		pdfLoadingTasks[fieldId] = loadingTask;
+		loadingTask.promise.then(function(pdfDoc_) {
 			pdfDocs[fieldId] = pdfDoc_;
 			document.getElementById( epdfInstance.id + '_page_count').textContent = pdfDocs[fieldId].numPages;
 			pdfDocs[fieldId].currentScaleValue = epdfInstance.dataset.initialScale;
@@ -100,7 +101,9 @@
 				el.innerHTML += msg;
 			}
 			// Hide the broken controls.
-			const controlEls = el.querySelectorAll( '.epdf-controls-container, .epdf-container' ).forEach( function( el ) { el.style.display ='none'; });
+			if ( el ) {
+				el.querySelectorAll( '.epdf-controls-container, .epdf-container' ).forEach( function( controlEl ) { controlEl.style.display ='none'; });
+			}
 		});
 	}
 
@@ -133,9 +136,10 @@
 			epdfInstance.height = viewport.height;
 			epdfInstance.width = viewport.width;
 
-			// Render PDF page into canvas context
+			// Render PDF page into canvas context (pdf.js v4+ requires canvas).
 			var renderContext = {
 				canvasContext: epdfInstance.getContext('2d'),
+				canvas: epdfInstance,
 				viewport: viewport
 			};
 			var renderTask = page.render(renderContext);

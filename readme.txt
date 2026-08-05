@@ -5,7 +5,7 @@ Tags: wpforms, wp forms, pdf, inkless
 Requires at least: 4.0
 Tested up to: 6.8.2
 Requires PHP: 5.6
-Stable tag: 1.1.6
+Stable tag: 1.1.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
  
@@ -40,12 +40,10 @@ Have an idea for a new feature? Please create an Issue on Github or Support Topi
 
 = pdfjs-dist package =
 
-This plugin includes https://www.npmjs.com/package/pdfjs-dist, which contains combined and minimized scripts built by the `gulp dist` command in https://github.com/mozilla/pdf.js. No unusual or additional action is required to download or install this plugin. If you wish to obtain the unminimized scripts or build pdfjs-dist yourself, use these commands:
+This plugin includes https://www.npmjs.com/package/pdfjs-dist (Mozilla PDF.js). No unusual or additional action is required to download or install this plugin. To rebuild the vendored scripts from the plugin directory:
 
-git clone https://github.com/mozilla/pdf.js
-cd pdf.js
 npm install
-gulp dist
+npm run build
 
 == Frequently Asked Questions ==
  
@@ -62,6 +60,11 @@ Please create an [Issue on Github](https://github.com/breakfastco/embed-pdf-wpfo
 
 
 == Changelog ==
+
+= 1.1.7 =
+* [Security] Updates pdf.js to 6.2.108 to address CVE-2024-4367 (arbitrary JavaScript execution via a malicious PDF).
+* [Changed] Loads pdf.js as an ES module.
+* [Fixed] Stops using the wpforms-page-button CSS class on viewer controls so WPForms pagebreak scripts do not treat them as form page navigation.
 
 = 1.1.6 =
 * [Fixed] Bug fixes for uploading PDFs in the form builder.
@@ -102,6 +105,9 @@ Please create an [Issue on Github](https://github.com/breakfastco/embed-pdf-wpfo
 
 
 == Upgrade Notice ==
+
+= 1.1.7 =
+Security update: upgrades pdf.js to address CVE-2024-4367.
 
 = 1.1.6 =
 Bug fixes for uploading PDFs in the form builder.
