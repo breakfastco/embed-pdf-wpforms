@@ -3,7 +3,7 @@
 Contributors: salzano
 Tags: wpforms, wp forms, pdf, inkless
 Requires at least: 4.0
-Tested up to: 6.8.2
+Tested up to: 7.0.2
 Requires PHP: 5.6
 Stable tag: 1.1.7
 License: GPLv3
@@ -62,9 +62,9 @@ Please create an [Issue on Github](https://github.com/breakfastco/embed-pdf-wpfo
 == Changelog ==
 
 = 1.1.7 =
-* [Security] Updates pdf.js to 6.2.108 to address CVE-2024-4367 (arbitrary JavaScript execution via a malicious PDF).
-* [Changed] Loads pdf.js as an ES module.
+* [Fixed] Updates pdf.js to 6.2.108.
 * [Fixed] Stops using the wpforms-page-button CSS class on viewer controls so WPForms pagebreak scripts do not treat them as form page navigation.
+* [Changed] Bumps tested up to version to 7.0.2.
 
 = 1.1.6 =
 * [Fixed] Bug fixes for uploading PDFs in the form builder.
@@ -107,7 +107,7 @@ Please create an [Issue on Github](https://github.com/breakfastco/embed-pdf-wpfo
 == Upgrade Notice ==
 
 = 1.1.7 =
-Security update: upgrades pdf.js to address CVE-2024-4367.
+Upgrades pdf.js to address 6.2.108. Bumps tested up to version to 7.0.2.
 
 = 1.1.6 =
 Bug fixes for uploading PDFs in the form builder.
