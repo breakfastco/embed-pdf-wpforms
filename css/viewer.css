@@ -16,6 +16,71 @@ div.wpforms-container-full .wpforms-field.wpforms-field-pdf_viewer{
 	border: 1px solid #e6e6e6;
 }
 
+/*
+ * Mimic WPForms .wpforms-page-button styles without using that class.
+ * Using wpforms-page-button would bind WPForms pagebreak navigation JS to these controls.
+ * Selectors include .wpforms-form so they beat WPForms' universal button { margin: 0 } reset.
+ */
+div.wpforms-container-full .wpforms-form .epdf-controls-container button.epdf-button{
+	background-color: #eee;
+	border: 1px solid #ddd;
+	color: #333;
+	cursor: pointer;
+	display: inline-block;
+	font-size: 0.9em;
+	font-weight: 400;
+	/* No horizontal margin: Modern WPForms page buttons also rely on HTML whitespace only. */
+	margin: 0;
+	padding: 10px 15px;
+	text-align: center;
+	text-decoration: none;
+	vertical-align: middle;
+}
+div.wpforms-container-full .wpforms-form .epdf-controls-container button.epdf-button:hover,
+div.wpforms-container-full .wpforms-form .epdf-controls-container button.epdf-button:active,
+div.wpforms-container-full .wpforms-form .epdf-controls-container button.epdf-button:focus{
+	background-color: #ddd;
+	border: 1px solid #ccc;
+	cursor: pointer;
+}
+div.wpforms-container-full .wpforms-form .epdf-controls-container button.epdf-button:disabled{
+	background-color: #eee;
+	border: 1px solid #ddd;
+	cursor: default;
+	opacity: 0.5;
+}
+
+/* Prefer WPForms Modern theme button tokens when available */
+div.wpforms-container-full.wpforms-render-modern .wpforms-form .epdf-controls-container button.epdf-button{
+	background-color: var(--wpforms-button-background-color);
+	border: none;
+	border-radius: var(--wpforms-button-border-radius);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+	color: var(--wpforms-button-text-color);
+	display: inline-block;
+	font-size: var(--wpforms-button-size-font-size);
+	font-weight: 500;
+	height: var(--wpforms-button-size-height);
+	line-height: 100%;
+	margin: 0;
+	padding: 0 var(--wpforms-button-size-padding-h);
+	position: relative;
+	transition: all 0.15s ease-in-out;
+	vertical-align: middle;
+}
+div.wpforms-container-full.wpforms-render-modern .wpforms-form .epdf-controls-container button.epdf-button:hover,
+div.wpforms-container-full.wpforms-render-modern .wpforms-form .epdf-controls-container button.epdf-button:active{
+	background: linear-gradient(0deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), var(--wpforms-button-background-color);
+	border: none;
+}
+div.wpforms-container-full.wpforms-render-modern .wpforms-form .epdf-controls-container button.epdf-button:disabled,
+div.wpforms-container-full.wpforms-render-modern .wpforms-form .epdf-controls-container button.epdf-button:disabled:hover{
+	background-color: var(--wpforms-button-background-color);
+	background-image: none;
+	cursor: default;
+	opacity: 0.5;
+}
+
 /* Space between controls and the top of the PDF */
 div.wpforms-container-full .epdf-controls-container{
 	padding-bottom: .95em;
@@ -33,7 +98,7 @@ div.wpforms-container-full .epdf-controls-container{
  * Wrap the "Page: 1 / 2" on smaller screens so it splits the buttons. Make the
  * buttons all the same width and spread as wide as allowed.
  */
- @media (max-width: 700px ) {
+@media (max-width: 700px ) {
 	.epdf-controls-container span.paging{
 		padding-left: .3em;
 	}
